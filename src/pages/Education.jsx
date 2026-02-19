@@ -1,197 +1,256 @@
-import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { 
+  FaGraduationCap, FaUniversity, FaCalendarAlt, 
+  FaAward, FaBook, FaCode
+} from 'react-icons/fa';
 import './Education.css';
 
-gsap.registerPlugin(ScrollTrigger);
-
 /**
- * Education Page Component
- * Animated vertical timeline of educational background
- * Features: SVG path drawing animation, scroll-triggered reveals
+ * Education Page - Academic Background & Courses
+ * Features: Timeline layout, course cards, achievement highlights
  */
 const Education = () => {
-  const timelineRef = useRef(null);
-  const svgPathRef = useRef(null);
-
   const education = [
     {
       id: 1,
-      degree: 'Bachelor of Science in Computer Science',
-      university: 'University Name',
-      duration: '2018 - 2022',
+      degree: "Computer Science",
+      institution: "Rai University",
+      location: "Dholka, Ahmedabad, India",
+      startDate: "Aug 2024",
+      endDate: "Aug 2028",
       highlights: [
-        'GPA: 3.8/4.0',
-        'Dean\'s List all semesters',
-        'President of Computer Science Club',
-        'Research in Machine Learning and AI',
+        "Strong foundation in both Frontend and Backend Web Development",
+        "Proficient in full-stack development with hands-on experience in HTML, CSS, JavaScript, React, Node.js, Express, and MongoDB",
+        "Skilled in basic problem solving, UI/UX design, and database management",
+        "Secured 9.62 CGPA in the first semester",
+        "Actively learning advanced web technologies and software engineering principles"
       ],
+      icon: <FaUniversity />
     },
     {
       id: 2,
-      degree: 'Full-Stack Web Development Bootcamp',
-      university: 'Coding Academy',
-      duration: '2022',
+      degree: "Higher Secondary Education (Science)",
+      institution: "Vivekanand Science Academy",
+      location: "Halvad, Dhrangadhra, India",
+      startDate: "Jun 2022",
+      endDate: "Mar 2024",
       highlights: [
-        'Intensive 12-week program',
-        'Built 10+ full-stack applications',
-        'Learned MERN stack and modern frameworks',
-        'Graduated with honors',
+        "Completed 12th grade with Science stream focusing on Physics, Chemistry, and Mathematics",
+        "Achieved 75.66% and secured a 72 percentile in board examinations",
+        "Built a strong academic foundation for engineering and computer science",
+        "Participated in various science fairs and school tech activities"
       ],
+      icon: <FaGraduationCap />
     },
     {
       id: 3,
-      degree: 'AWS Solutions Architect Certification',
-      university: 'Amazon Web Services',
-      duration: '2023',
+      degree: "Secondary School Certificate (SSC)",
+      institution: "Sunrise Smart School",
+      location: "Dhrangadhra, Surendranagar, India",
+      startDate: "Jun 2021",
+      endDate: "Mar 2022",
       highlights: [
-        'Cloud architecture and design',
-        'Serverless computing',
-        'Database and storage solutions',
-        'Security and compliance',
+        "Achieved outstanding academic results with 91% and 98.66 percentile",
+        "Awarded A1 grade for exceptional performance in all subjects",
+        "Demonstrated strong aptitude in Mathematics and Science",
+        "Recognized for discipline and consistent academic excellence"
       ],
-    },
-  ];
-
-  useEffect(() => {
-    // Animate SVG path drawing using stroke-dasharray technique
-    if (svgPathRef.current) {
-      const pathLength = svgPathRef.current.getTotalLength();
-      
-      // Set initial dash array
-      gsap.set(svgPathRef.current, {
-        strokeDasharray: pathLength,
-        strokeDashoffset: pathLength,
-      });
-      
-      // Animate the drawing
-      gsap.to(svgPathRef.current, {
-        strokeDashoffset: 0,
-        duration: 2,
-        ease: 'power2.inOut',
-        scrollTrigger: {
-          trigger: timelineRef.current,
-          start: 'top 80%',
-          end: 'bottom 20%',
-          scrub: 1,
-        },
-      });
-
-      // Animate dots appearing
-      const dots = document.querySelectorAll('.timeline-dot');
-      dots.forEach((dot, index) => {
-        gsap.fromTo(
-          dot,
-          { scale: 0, opacity: 0 },
-          {
-            scale: 1,
-            opacity: 1,
-            duration: 0.6,
-            scrollTrigger: {
-              trigger: dot,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
-      });
+      icon: <FaBook />
     }
-
-    // Animate timeline items
-    const items = document.querySelectorAll('.timeline-item');
-    items.forEach((item, index) => {
-      gsap.fromTo(
-        item,
-        { opacity: 0, x: index % 2 === 0 ? -50 : 50 },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: item,
-            start: 'top 85%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
-    });
-  }, []);
+  ];
 
   return (
     <>
       <Helmet>
-        <title>Education | Your Name - Academic Background</title>
-        <meta name="description" content="Explore my educational background including degrees, certifications, and academic achievements in computer science and web development." />
-        <meta property="og:title" content="Education | Your Name" />
-        <meta property="og:description" content="Academic background and educational achievements" />
-        <link rel="canonical" href="https://yourportfolio.com/education" />
+        <title>Education | Dhruv Sonagra</title>
+        <meta name="description" content="My academic background, degrees, and continuous learning through online courses." />
       </Helmet>
 
-      <main className="education">
-        <div className="education-container">
-          {/* Page Header */}
+      <main className="education" style={{ paddingTop: '120px' }}>
+        {/* Header */}
+        <section className="container" style={{ marginBottom: '4rem' }}>
           <motion.div
-            className="page-header"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            style={{ textAlign: 'center' }}
           >
-            <h1 className="gradient-text">Education</h1>
-            <p className="page-subtitle">My academic journey</p>
+            <span style={{
+              display: 'inline-block',
+              padding: '0.5rem 1rem',
+              background: 'rgba(139, 92, 246, 0.1)',
+              border: '1px solid rgba(139, 92, 246, 0.2)',
+              borderRadius: '9999px',
+              fontSize: '0.875rem',
+              color: '#8b5cf6',
+              marginBottom: '1.5rem'
+            }}>
+              <FaGraduationCap style={{ marginRight: '0.5rem', display: 'inline' }} />
+              Academic Background
+            </span>
+            <h1 style={{
+              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+              fontWeight: 700,
+              marginBottom: '1rem'
+            }}>
+              Education &{' '}
+              <span style={{
+                background: 'linear-gradient(90deg, #8b5cf6, #00d4ff)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}>
+                Learning
+              </span>
+            </h1>
+            <p style={{
+              fontSize: '1.125rem',
+              color: '#94a3b8',
+              maxWidth: '600px',
+              margin: '0 auto'
+            }}>
+              My academic journey and continuous learning through courses and certifications
+            </p>
           </motion.div>
+        </section>
 
-          {/* Timeline */}
-          <div ref={timelineRef} className="timeline">
-            {/* Timeline SVG Path */}
-            <svg className="timeline-svg" viewBox="0 0 4 800" preserveAspectRatio="none">
-              <path
-                ref={svgPathRef}
-                d="M 2 0 L 2 800"
-                stroke="url(#gradient)"
-                strokeWidth="2"
-                fill="none"
-                strokeLinecap="round"
-              />
-              <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#667eea" />
-                  <stop offset="50%" stopColor="#764ba2" />
-                  <stop offset="100%" stopColor="#f093fb" />
-                </linearGradient>
-              </defs>
-            </svg>
+        {/* Education Timeline */}
+        <section className="container" style={{ marginBottom: '6rem' }}>
+          <h2 style={{
+            fontSize: '1.5rem',
+            fontWeight: 600,
+            marginBottom: '2rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem'
+          }}>
+            <FaUniversity style={{ color: '#8b5cf6' }} />
+            Formal Education
+          </h2>
 
-            {/* Timeline Items */}
+          <div style={{ position: 'relative' }}>
+            {/* Timeline Line */}
+            <div style={{
+              position: 'absolute',
+              left: '24px',
+              top: 0,
+              bottom: 0,
+              width: '2px',
+              background: 'linear-gradient(180deg, #8b5cf6, #00d4ff)'
+            }} />
+
             {education.map((edu, index) => (
-              <div
+              <motion.div
                 key={edu.id}
-                className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
+                style={{
+                  position: 'relative',
+                  paddingLeft: '80px',
+                  paddingBottom: '2rem'
+                }}
               >
                 {/* Timeline Dot */}
-                <div className="timeline-dot">
-                  <div className="timeline-dot-inner"></div>
+                <div style={{
+                  position: 'absolute',
+                  left: '10px',
+                  top: '4px',
+                  width: '30px',
+                  height: '30px',
+                  borderRadius: '50%',
+                  background: '#8b5cf6',
+                  border: '4px solid #0a0e1a',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#fff',
+                  fontSize: '0.75rem'
+                }}>
+                  {edu.icon}
                 </div>
 
-                {/* Timeline Content */}
-                <div className="timeline-content glass-card">
-                  <span className="timeline-duration badge badge-primary">
-                    {edu.duration}
-                  </span>
-                  <h3 className="timeline-degree">{edu.degree}</h3>
-                  <p className="timeline-university">{edu.university}</p>
-                  
-                  <ul className="timeline-highlights">
-                    {edu.highlights.map((highlight, idx) => (
-                      <li key={idx}>{highlight}</li>
-                    ))}
-                  </ul>
+                {/* Content Card */}
+                <div style={{
+                  padding: '2rem',
+                  background: 'linear-gradient(145deg, rgba(20, 29, 51, 0.6) 0%, rgba(10, 14, 26, 0.8) 100%)',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  borderRadius: '1rem'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    marginBottom: '1rem',
+                    flexWrap: 'wrap',
+                    gap: '0.5rem'
+                  }}>
+                    <div>
+                      <h3 style={{
+                        fontSize: '1.25rem',
+                        fontWeight: 600,
+                        marginBottom: '0.5rem'
+                      }}>
+                        {edu.degree}
+                      </h3>
+                      <p style={{ color: '#8b5cf6', fontWeight: 500 }}>
+                        {edu.institution}, {edu.location}
+                      </p>
+                    </div>
+                    <span style={{
+                      padding: '0.375rem 0.875rem',
+                      background: 'rgba(139, 92, 246, 0.1)',
+                      border: '1px solid rgba(139, 92, 246, 0.2)',
+                      borderRadius: '9999px',
+                      fontSize: '0.75rem',
+                      color: '#8b5cf6',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.375rem'
+                    }}>
+                      <FaCalendarAlt />
+                      {edu.startDate} - {edu.endDate}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h4 style={{
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      color: '#64748b',
+                      marginBottom: '0.75rem'
+                    }}>
+                      Highlights
+                    </h4>
+                    <ul style={{
+                      listStyle: 'none',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.5rem'
+                    }}>
+                      {edu.highlights.map((highlight, i) => (
+                        <li 
+                          key={i}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            fontSize: '0.875rem',
+                            color: '#94a3b8'
+                          }}
+                        >
+                          <span style={{ color: '#10b981' }}>✓</span>
+                          {highlight}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </section>
       </main>
     </>
   );
