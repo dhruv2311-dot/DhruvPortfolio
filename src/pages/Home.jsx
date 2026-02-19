@@ -96,6 +96,10 @@ const Home = () => {
           span.style.display = 'inline-block';
           span.style.marginRight = '0.3em';
           span.style.opacity = '1';
+          span.style.background = 'linear-gradient(90deg, #00d4ff, #8b5cf6)';
+          span.style.webkitBackgroundClip = 'text';
+          span.style.webkitTextFillColor = 'transparent';
+          span.style.backgroundClip = 'text';
           span.className = 'word';
           roleEl.appendChild(span);
         });
