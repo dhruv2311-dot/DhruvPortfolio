@@ -443,3 +443,33 @@
     justify-content: center;
   }
 }
+
+/* Featured Certificates Swiper Styles */
+.featured-certs-swiper {
+  width: 100%;
+}
+
+.featured-certs-swiper .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.5rem;
+}
+
+.featured-certs-swiper .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.4);
+  opacity: 0.5;
+  width: 10px;
+  height: 10px;
+}
+
+.featured-certs-swiper .swiper-pagination-bullet-active {
+  background: #f43f5e;
+  opacity: 1;
+  box-shadow: 0 0 15px #f43f5e;
+}
+
+/* Card Effect Shadow Override */
+.featured-certs-swiper .swiper-slide-shadow {
+  background: rgba(244, 63, 94, 0.1);
+}
