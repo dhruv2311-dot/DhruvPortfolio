@@ -390,3 +390,65 @@
     right: var(--spacing-md);
   }
 }
+
+/* Swiper Featured Projects Styles */
+.featured-projects-swiper {
+  width: 100%;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.featured-projects-swiper .swiper-slide {
+  background-position: center;
+  background-size: cover;
+}
+
+.featured-projects-swiper .swiper-slide-shadow-left,
+.featured-projects-swiper .swiper-slide-shadow-right {
+  background-image: linear-gradient(to left, rgba(0, 212, 255, 0.2), transparent);
+}
+
+.featured-projects-swiper .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.4);
+  opacity: 0.5;
+  width: 10px;
+  height: 10px;
+}
+
+.featured-projects-swiper .swiper-pagination-bullet-active {
+  background: #00d4ff;
+  opacity: 1;
+  box-shadow: 0 0 15px #00d4ff;
+}
+
+.featured-projects-swiper .swiper-button-next,
+.featured-projects-swiper .swiper-button-prev {
+  color: #00d4ff;
+  background: rgba(10, 14, 26, 0.8);
+  backdrop-filter: blur(10px);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.featured-projects-swiper .swiper-button-next::after,
+.featured-projects-swiper .swiper-button-prev::after {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.featured-projects-swiper .swiper-button-next:hover,
+.featured-projects-swiper .swiper-button-prev:hover {
+  background: rgba(0, 212, 255, 0.2);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .featured-projects-swiper .swiper-button-next,
+  .featured-projects-swiper .swiper-button-prev {
+    display: none;
+  }
+}
