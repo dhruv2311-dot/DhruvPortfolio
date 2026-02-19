@@ -1,329 +1,296 @@
-import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { FaGithub, FaLinkedin, FaTwitter, FaDownload } from 'react-icons/fa';
-import { gsap } from 'gsap';
-import Matter from 'matter-js';
-import useMagneticButton from '../hooks/useMagneticButton';
+import { 
+  FaDownload,
+  FaGithub,
+  FaLinkedin,
+  FaTwitter,
+  FaInstagram,
+  FaCode,
+  FaYoutube
+} from 'react-icons/fa';
 import './About.css';
 
 /**
- * About Page Component with Matter.js Physics
- * Features: Physics-based floating profile image, interactive floating bubbles, animated stats
+ * About Page - Simple Profile with Social Links
+ * Features: Profile picture, description, resume download, social cards
  */
 const About = () => {
-  const downloadButtonRef = useMagneticButton(0.4);
-  const statsRef = useRef(null);
-  const physicsCanvasRef = useRef(null);
-  const physicsEngineRef = useRef(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
   const socialLinks = [
-    {
-      name: 'GitHub',
-      icon: <FaGithub />,
-      url: 'https://github.com/yourusername',
+    { 
+      icon: <FaGithub />, 
+      url: 'https://github.com/dhruv2311-dot', 
+      label: 'GitHub', 
       color: '#333',
+      description: 'Check out my code'
     },
-    {
-      name: 'LinkedIn',
-      icon: <FaLinkedin />,
-      url: 'https://linkedin.com/in/yourusername',
+    { 
+      icon: <FaLinkedin />, 
+      url: 'https://www.linkedin.com/in/dhruv-sonagra-995144321/', 
+      label: 'LinkedIn', 
       color: '#0077b5',
+      description: 'Connect professionally'
+    },
+    { 
+      icon: <FaTwitter />, 
+      url: 'https://x.com/dhruvvv_23_', 
+      label: 'Twitter', 
+      color: '#1da1f2',
+      description: 'Follow my thoughts'
+    },
+
+    { 
+      icon: <FaInstagram />, 
+      url: 'https://www.instagram.com/dhruvvv_23_/', 
+      label: 'Instagram', 
+      color: '#e4405f',
+      description: 'See my life'
     },
     {
-      name: 'Twitter',
-      icon: <FaTwitter />,
-      url: 'https://twitter.com/yourusername',
-      color: '#1da1f2',
+      icon: <FaCode />,
+      url: 'https://leetcode.com/u/dhruvvv_23/', 
+      label: 'LeetCode',
+      color: '#ffa116',
+      description: 'Problem solving'
     },
+    {
+      icon: <FaYoutube />,
+      url: 'https://www.youtube.com/@Itz_dhruvv', 
+      label: 'YouTube',
+      color: '#ff0000',
+      description: 'Tech tutorials'
+    }
   ];
-
-  // Matter.js Physics Engine Setup
-  useEffect(() => {
-    if (!physicsCanvasRef.current) return;
-
-    const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Events } = Matter;
-
-    // Create engine
-    const engine = Engine.create({
-      gravity: { x: 0, y: 0.3, scale: 0.001 }
-    });
-    physicsEngineRef.current = engine;
-
-    // Create renderer
-    const render = Render.create({
-      canvas: physicsCanvasRef.current,
-      engine: engine,
-      options: {
-        width: 400,
-        height: 500,
-        wireframes: false,
-        background: 'transparent'
-      }
-    });
-
-    // Create boundaries (invisible walls)
-    const wallOptions = { isStatic: true, render: { visible: false } };
-    const ground = Bodies.rectangle(200, 510, 400, 20, wallOptions);
-    const leftWall = Bodies.rectangle(-10, 250, 20, 500, wallOptions);
-    const rightWall = Bodies.rectangle(410, 250, 20, 500, wallOptions);
-    const ceiling = Bodies.rectangle(200, -10, 400, 20, wallOptions);
-
-    // Create decorative floating bubbles
-    const bubbles = [];
-    const bubbleColors = [
-      '#667eea', '#764ba2', '#f093fb', '#4facfe', '#00f2fe', '#43e97b'
-    ];
-    
-    // Create multiple small bubbles
-    for (let i = 0; i < 12; i++) {
-      const x = 60 + Math.random() * 280;
-      const y = 50 + Math.random() * 400;
-      const radius = 15 + Math.random() * 20;
-      const color = bubbleColors[Math.floor(Math.random() * bubbleColors.length)];
-      
-      const bubble = Bodies.circle(x, y, radius, {
-        restitution: 0.9,
-        friction: 0.001,
-        density: 0.0008,
-        render: {
-          fillStyle: color + '15',
-          strokeStyle: color,
-          lineWidth: 2
-        }
-      });
-      bubbles.push(bubble);
-    }
-
-    // Add profile image as physics body (larger circle in center)
-    const profileBody = Bodies.circle(200, 200, 65, {
-      restitution: 0.95,
-      friction: 0.005,
-      density: 0.003,
-      render: {
-        fillStyle: '#667eea30',
-        strokeStyle: '#667eea',
-        lineWidth: 4
-      },
-      isProfile: true
-    });
-    bubbles.push(profileBody);
-
-    // Add all bodies to world
-    Composite.add(engine.world, [ground, leftWall, rightWall, ceiling, ...bubbles]);
-
-    // Mouse constraint for interactions
-    const mouse = Mouse.create(render.canvas);
-    const mouseConstraint = MouseConstraint.create(engine, {
-      mouse: mouse,
-      constraint: {
-        stiffness: 0.2,
-        render: { visible: false }
-      }
-    });
-    Composite.add(engine.world, mouseConstraint);
-
-    // Track mouse position for custom rendering
-    Events.on(mouseConstraint, 'mousemove', (event) => {
-      const { x, y } = event.mouse.position;
-      setMousePosition({ x, y });
-    });
-
-    // Apply random forces periodically for floating effect
-    const applyFloatingForces = () => {
-      bubbles.forEach(bubble => {
-        const forceMagnitude = 0.0002;
-        Matter.Body.applyForce(bubble, bubble.position, {
-          x: (Math.random() - 0.5) * forceMagnitude,
-          y: (Math.random() - 0.5) * forceMagnitude
-        });
-      });
-    };
-
-    const forceInterval = setInterval(applyFloatingForces, 100);
-
-    // Run engine and renderer
-    const runner = Runner.create();
-    Runner.run(runner, engine);
-    Render.run(render);
-
-    // Cleanup
-    return () => {
-      clearInterval(forceInterval);
-      Render.stop(render);
-      Runner.stop(runner);
-      Engine.clear(engine);
-      render.canvas.remove();
-    };
-  }, []);
-
-  // Animate stats counters with GSAP
-  useEffect(() => {
-    // Animate stats counters
-    if (statsRef.current) {
-      const statNumbers = statsRef.current.querySelectorAll('.stat-number');
-      statNumbers.forEach((stat, index) => {
-        const targetValue = parseInt(stat.getAttribute('data-value'));
-        gsap.fromTo(
-          stat,
-          { innerText: 0 },
-          {
-            innerText: targetValue,
-            duration: 2,
-            delay: index * 0.2,
-            snap: { innerText: 1 },
-          }
-        );
-      });
-    }
-  }, []);
 
   return (
     <>
       <Helmet>
-        <title>About | Your Name - Full-Stack Developer</title>
-        <meta name="description" content="Learn more about my journey as a full-stack developer, my skills, and my passion for creating innovative web solutions." />
-        <meta property="og:title" content="About | Your Name" />
-        <meta property="og:description" content="Learn more about my journey as a full-stack developer" />
-        <link rel="canonical" href="https://yourportfolio.com/about" />
+        <title>About | Dhruv Sonagra</title>
+        <meta name="description" content="Learn about my journey as a Full-Stack Developer and connect with me." />
       </Helmet>
 
-      <main className="about">
-        <div className="about-container">
-          {/* Page Header */}
-          <motion.div
-            className="page-header"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="gradient-text">About Me</h1>
-            <p className="page-subtitle">Get to know me better</p>
-          </motion.div>
-
-          {/* About Content */}
-          <div className="about-content">
-            {/* Physics Profile Section */}
-            <div className="about-profile">
-              <motion.div 
-                className="physics-container"
-                initial={{ opacity: 0, scale: 0.9 }}
+      <main className="about" style={{ paddingTop: '120px', minHeight: '100vh' }}>
+        <div className="container">
+          {/* Profile Section */}
+          <section style={{ marginBottom: '4rem' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 2fr',
+              gap: '4rem',
+              alignItems: 'center'
+            }}>
+              {/* Profile Picture */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
+                transition={{ duration: 0.6 }}
+                style={{
+                  position: 'relative'
+                }}
               >
-                <canvas ref={physicsCanvasRef} className="physics-canvas" />
-                
-                {/* Overlay profile image on physics body */}
-                <div className="profile-image-wrapper">
-                  <div className="profile-image">
-                    <img
-                      src="https://via.placeholder.com/130x130/667eea/ffffff?text=You"
-                      alt="Your Name - Full-Stack Developer"
-                      loading="lazy"
-                    />
-                    <div className="profile-glow"></div>
-                  </div>
+                <div style={{
+                  width: '300px',
+                  height: '300px',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  border: '3px solid rgba(0, 212, 255, 0.3)',
+                  boxShadow: '0 0 60px rgba(0, 212, 255, 0.2)'
+                }}>
+                  <img
+                    src="https://res.cloudinary.com/dtkzxbcjx/image/upload/v1770642896/IMG_1208_uxkdnq.png"
+                    alt="Dhruv Sonagra"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      objectPosition: 'center 25%'
+                    }}
+                  />
                 </div>
-
-                {/* Physics interaction hint */}
-                <div className="physics-hint">
-                  <p>Drag and interact with the bubbles!</p>
-                </div>
+                {/* Decorative ring */}
+                <div style={{
+                  position: 'absolute',
+                  inset: '-10px',
+                  border: '2px solid rgba(139, 92, 246, 0.2)',
+                  borderRadius: '50%',
+                  animation: 'spin 20s linear infinite'
+                }} />
               </motion.div>
 
-              {/* Stats */}
-              <div ref={statsRef} className="about-stats">
-                <motion.div 
-                  className="stat-item"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
+              {/* Description */}
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <span style={{
+                  display: 'inline-block',
+                  padding: '0.5rem 1rem',
+                  background: 'rgba(0, 212, 255, 0.1)',
+                  border: '1px solid rgba(0, 212, 255, 0.2)',
+                  borderRadius: '9999px',
+                  fontSize: '0.875rem',
+                  color: '#00d4ff',
+                  marginBottom: '1.5rem'
+                }}>
+                  About Me
+                </span>
+
+                <h1 style={{
+                  fontSize: 'clamp(2rem, 4vw, 3rem)',
+                  fontWeight: 700,
+                  marginBottom: '1.5rem'
+                }}>
+                  Hi, I'm{' '}
+                  <span style={{
+                    background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent'
+                  }}>
+                    Dhruv Sonagra
+                  </span>
+                </h1>
+
+                <p style={{
+                  fontSize: '1.125rem',
+                  color: '#94a3b8',
+                  lineHeight: 1.8,
+                  marginBottom: '1.5rem'
+                }}>
+                  I'm a passionate Full-Stack Developer with a strong foundation in both frontend and backend technologies. My journey in web development started with a curiosity about how things work on the internet, and it has evolved into a professional pursuit of creating elegant, efficient, and user-friendly applications.
+                </p>
+
+                <p style={{
+                  fontSize: '1.125rem',
+                  color: '#94a3b8',
+                  lineHeight: 1.8,
+                  marginBottom: '1.5rem'
+                }}>
+                  My technical interests include:
+                </p>
+
+                <ul style={{
+                  listStyle: 'disc',
+                  paddingLeft: '1.5rem',
+                  marginBottom: '1.5rem',
+                  color: '#94a3b8',
+                  fontSize: '1.125rem',
+                  lineHeight: 1.8
+                }}>
+                  <li style={{ marginBottom: '0.5rem' }}>Building scalable web applications</li>
+                  <li style={{ marginBottom: '0.5rem' }}>Creating intuitive user interfaces</li>
+                  <li style={{ marginBottom: '0.5rem' }}>Optimizing application performance</li>
+                  <li style={{ marginBottom: '0.5rem' }}>Learning new technologies and frameworks</li>
+                </ul>
+
+                <p style={{
+                  fontSize: '1rem',
+                  color: '#64748b',
+                  lineHeight: 1.7,
+                  marginBottom: '2rem'
+                }}>
+                  When I'm not coding, you can find me exploring new technologies, contributing to open-source projects, or sharing my knowledge through technical blog posts.
+                </p>
+
+                {/* Download Resume Button */}
+                <motion.a
+                  href="https://drive.google.com/file/d/1FjF18VC8QK7bAad8wifswbDqiojUBKXe/view?usp=sharing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary magnetic"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <h3 className="stat-number gradient-text" data-value="50">0+</h3>
-                  <p className="stat-label">Projects</p>
-                </motion.div>
-                <motion.div 
-                  className="stat-item"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                >
-                  <h3 className="stat-number gradient-text" data-value="3">0+</h3>
-                  <p className="stat-label">Years Experience</p>
-                </motion.div>
-                <motion.div 
-                  className="stat-item"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.5 }}
-                >
-                  <h3 className="stat-number gradient-text" data-value="15">0+</h3>
-                  <p className="stat-label">Certificates</p>
-                </motion.div>
-              </div>
+                  <FaDownload />
+                  Download Resume
+                </motion.a>
+              </motion.div>
             </div>
+          </section>
 
-            {/* Bio Section */}
-            <motion.div 
-              className="about-bio"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+          {/* Social Cards Section */}
+          <section style={{ paddingBottom: '6rem' }}>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 600,
+                textAlign: 'center',
+                marginBottom: '2rem'
+              }}
             >
-              <h2>My Journey</h2>
-              <p>
-                I'm a passionate full-stack developer with a love for creating elegant solutions
-                to complex problems. My journey in web development started with a curiosity about
-                how websites work, and it has evolved into a career dedicated to building
-                exceptional digital experiences.
-              </p>
-              <p>
-                With expertise in modern web technologies including React, Node.js, and cloud
-                platforms, I specialize in creating scalable, performant applications that
-                deliver real value to users. I believe in writing clean, maintainable code and
-                following best practices to ensure long-term project success.
-              </p>
-              <p>
-                When I'm not coding, you'll find me exploring new technologies, contributing to
-                open-source projects, or sharing my knowledge through technical writing and
-                mentoring.
-              </p>
+              Let's Connect
+            </motion.h2>
 
-              {/* Resume Download */}
-              <button ref={downloadButtonRef} className="btn btn-primary btn-magnetic download-btn">
-                <FaDownload />
-                Download Resume
-              </button>
-            </motion.div>
-          </div>
-
-          {/* Social Cards */}
-          <div className="social-cards">
-            <h2 className="section-title">Let's Connect</h2>
-            <div className="social-cards-grid">
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '1.5rem'
+            }}>
               {socialLinks.map((social, index) => (
                 <motion.a
-                  key={social.name}
+                  key={social.label}
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="social-card glass-card"
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ 
+                    y: -5,
+                    transition: { duration: 0.2 }
+                  }}
+                  style={{
+                    padding: '2rem',
+                    background: 'linear-gradient(145deg, rgba(20, 29, 51, 0.6) 0%, rgba(10, 14, 26, 0.8) 100%)',
+                    border: `1px solid ${social.color}30`,
+                    borderRadius: '1rem',
+                    textAlign: 'center',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                    textDecoration: 'none'
+                  }}
                 >
-                  <div className="social-card-icon" style={{ color: social.color }}>
+                  <div style={{
+                    width: '60px',
+                    height: '60px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: `${social.color}15`,
+                    borderRadius: '50%',
+                    fontSize: '1.75rem',
+                    color: social.color,
+                    margin: '0 auto 1rem'
+                  }}>
                     {social.icon}
                   </div>
-                  <h3>{social.name}</h3>
-                  <p>Follow me on {social.name}</p>
+                  <h3 style={{
+                    fontSize: '1.125rem',
+                    fontWeight: 600,
+                    marginBottom: '0.5rem',
+                    color: '#fff'
+                  }}>
+                    {social.label}
+                  </h3>
+                  <p style={{
+                    fontSize: '0.875rem',
+                    color: '#64748b'
+                  }}>
+                    {social.description}
+                  </p>
                 </motion.a>
               ))}
             </div>
-          </div>
+          </section>
         </div>
       </main>
     </>
