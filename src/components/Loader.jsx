@@ -1,31 +1,27 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Player } from '@lottiefiles/react-lottie-player';
 import './Loader.css';
 
 /**
  * Loading Screen Component
- * Full-screen animated loader with Lottie animation from @lottiefiles
- * Displays before the main content loads
+ * Professional animated loader with CSS-driven orbital animation
  */
 const Loader = ({ onLoadComplete }) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Simulate loading progress
     const interval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           clearInterval(interval);
-          // Delay before calling onLoadComplete to show 100%
           setTimeout(() => {
             onLoadComplete();
           }, 500);
           return 100;
         }
-        return prev + 10;
+        return prev + Math.floor(Math.random() * 8) + 3;
       });
-    }, 150);
+    }, 120);
 
     return () => clearInterval(interval);
   }, [onLoadComplete]);
@@ -34,70 +30,96 @@ const Loader = ({ onLoadComplete }) => {
     <motion.div
       className="loader-container"
       initial={{ opacity: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.5 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.6 }}
     >
       <div className="loader-content">
-        {/* Professional Lottie Animation */}
+        {/* Orbital Animation */}
         <motion.div
-          className="loader-logo"
-          initial={{ scale: 0.5, opacity: 0 }}
+          className="loader-orbital-wrap"
+          initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6, ease: 'backOut' }}
         >
-          <Player
-            autoplay
-            loop
-            src="https://lottie.host/4c5b5e7f-3a4c-4e0e-9c6a-2c6d3f3e3c3e/UFdOPP5CqX.json"
-            style={{ height: '200px', width: '200px' }}
-          />
+          <div className="loader-orbital">
+            <div className="loader-orbital-ring loader-ring-1"></div>
+            <div className="loader-orbital-ring loader-ring-2"></div>
+            <div className="loader-orbital-ring loader-ring-3"></div>
+            <div className="loader-orbital-core">
+              <span>DS</span>
+            </div>
+          </div>
         </motion.div>
 
-        {/* Loading Text with Gradient */}
+        {/* Name */}
         <motion.h2
-          className="loader-text gradient-text"
+          className="loader-text"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5 }}
-        >
-          <span style={{
+          style={{
             background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             fontSize: '1.5rem',
-            fontWeight: 700
-          }}>
-            Loading Portfolio
-          </span>
+            fontWeight: 700,
+            marginBottom: '0.5rem'
+          }}
+        >
+          Dhruv Sonagra
         </motion.h2>
 
-        {/* Modern Progress Bar */}
-        <div className="loader-progress-container">
-          <motion.div
-            className="loader-progress-bar"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.3 }}
-            style={{
-              background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
-              boxShadow: '0 0 20px rgba(0, 212, 255, 0.5)'
-            }}
-          />
-        </div>
-
-        {/* Progress Percentage */}
+        {/* Subtitle */}
         <motion.p
-          className="loader-percentage"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
           style={{
-            color: '#00d4ff',
-            fontSize: '1rem',
-            fontWeight: 600
+            color: '#64748b',
+            fontSize: '0.9rem',
+            marginBottom: '2rem',
+            letterSpacing: '2px',
+            textTransform: 'uppercase'
           }}
         >
-          {progress}%
+          Loading Portfolio
+        </motion.p>
+
+        {/* Progress Bar */}
+        <div style={{
+          width: '280px',
+          height: '3px',
+          background: 'rgba(255, 255, 255, 0.08)',
+          borderRadius: '999px',
+          overflow: 'hidden',
+          margin: '0 auto 1rem'
+        }}>
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${Math.min(progress, 100)}%` }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            style={{
+              height: '100%',
+              background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
+              boxShadow: '0 0 15px rgba(0, 212, 255, 0.6)',
+              borderRadius: '999px'
+            }}
+          />
+        </div>
+
+        {/* Percentage */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          style={{
+            color: '#00d4ff',
+            fontSize: '0.875rem',
+            fontWeight: 600,
+            fontFamily: 'monospace'
+          }}
+        >
+          {Math.min(progress, 100)}%
         </motion.p>
       </div>
     </motion.div>
