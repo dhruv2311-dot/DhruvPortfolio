@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
 import { HelmetProvider } from 'react-helmet-async';
+import { motion } from 'framer-motion';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Snowfall from 'react-snowfall';
 
-// Hooks
-import useSmoothScroll from './hooks/useSmoothScroll';
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger);
 
 // Components
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
-import Loader from './components/Loader';
-import Background3D from './components/Background3D';
-import Cursor from './components/Cursor'; // Import Cursor
+import Cursor from './components/Cursor';
+import ScrollProgress from './components/ScrollProgress';
+import PageTransition from './components/PageTransition';
 
 // Pages
 import Home from './pages/Home';
@@ -27,91 +29,144 @@ import Contact from './pages/Contact';
 import './index.css';
 
 /**
- * Animated Routes Component
- * Handles page transitions with Framer Motion
+ * Scroll to top on route change
  */
-function AnimatedRoutes() {
-  const location = useLocation();
-
-  return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/skills" element={<Skills />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/certificates" element={<Certificates />} />
-        <Route path="/education" element={<Education />} />
-        <Route path="/contact" element={<Contact />} />
-      </Routes>
-    </AnimatePresence>
-  );
-}
-
-function RouteScrollToTop() {
-  const location = useLocation();
-
-  // Keep this component lightweight: route change => reset scroll.
-  // This avoids getting "stuck" mid-page when navigating away from long sections.
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, [location.pathname]);
-
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
   return null;
 }
 
 /**
  * Main App Component
- * Orchestrates all global features: loading, smooth scroll, cursor, 3D background, snowfall
+ * Orchestrates all global features and routing
  */
 function App() {
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize smooth scrolling (must be called as a hook)
-  useSmoothScroll();
+  // Initial loading animation
+  useEffect(() => {
+    // Simulate loading time for assets
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
 
-  // Handle loading complete
-  const handleLoadComplete = () => {
-    setIsLoading(false);
-  };
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Refresh ScrollTrigger after loading
+  useEffect(() => {
+    if (!isLoading) {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
+
+  if (isLoading) {
+    return (
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        background: '#0a0e1a',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              fontSize: '2rem',
+              fontWeight: 700,
+              background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              marginBottom: '1.5rem'
+            }}
+          >
+            Dhruv Sonagra
+          </motion.div>
+          <div style={{
+            width: '200px',
+            height: '3px',
+            background: 'rgba(255,255,255,0.1)',
+            borderRadius: '3px',
+            overflow: 'hidden'
+          }}>
+            <motion.div
+              style={{
+                height: '100%',
+                background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)'
+              }}
+              initial={{ width: '0%' }}
+              animate={{ width: '100%' }}
+              transition={{ duration: 1.2, ease: 'easeInOut' }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <HelmetProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <RouteScrollToTop />
-        <div className="app">
-          {/* Custom Cursor Component - Always Rendered but handles its own visibility */}
-          <Cursor />
-
-          {/* Loading Screen */}
-          {isLoading && <Loader onLoadComplete={handleLoadComplete} />}
-
-          {/* Main Content */}
-          {!isLoading && (
-            <>
-              {/* Global Background Effects */}
-              <Background3D />
-              <Snowfall
-                color="#667eea"
-                snowflakeCount={50}
-                style={{
-                  position: 'fixed',
-                  width: '100vw',
-                  height: '100vh',
-                  zIndex: 0,
-                }}
-              />
-
-              {/* Navigation */}
-              <Navigation />
-
-              {/* Page Content */}
-              <AnimatedRoutes />
-
-              {/* Footer */}
-              <Footer />
-            </>
-          )}
+        <ScrollToTop />
+        
+        {/* Custom Cursor */}
+        <Cursor />
+        
+        {/* Scroll Progress */}
+        <ScrollProgress />
+        
+        <div className="app" style={{ minHeight: '100vh', position: 'relative' }}>
+          {/* Snowfall Effect */}
+          <Snowfall
+            color="#00d4ff"
+            snowflakeCount={80}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 1,
+              pointerEvents: 'none'
+            }}
+            radius={[0.5, 2]}
+            speed={[0.5, 1.5]}
+            wind={[-0.5, 0.5]}
+          />
+          
+          {/* Navigation */}
+          <Navigation />
+          
+          {/* Main Content with Page Transitions */}
+          <main style={{ position: 'relative', zIndex: 10, minHeight: '100vh' }}>
+            <PageTransition>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/skills" element={<Skills />} />
+                <Route path="/projects" element={<Projects />} />
+                <Route path="/certificates" element={<Certificates />} />
+                <Route path="/education" element={<Education />} />
+                <Route path="/contact" element={<Contact />} />
+              </Routes>
+            </PageTransition>
+          </main>
+          
+          {/* Footer */}
+          <Footer />
         </div>
       </Router>
     </HelmetProvider>
