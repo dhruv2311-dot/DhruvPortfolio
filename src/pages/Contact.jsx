@@ -1,356 +1,544 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaPaperPlane } from 'react-icons/fa';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { animate } from 'animejs';
-import useMagneticButton from '../hooks/useMagneticButton';
+import { 
+  FaEnvelope, FaPhone, FaMapMarkerAlt, FaGithub,
+  FaLinkedin, FaTwitter, FaInstagram, FaPaperPlane,
+  FaCheckCircle, FaExclamationCircle
+} from 'react-icons/fa';
 import './Contact.css';
 
-gsap.registerPlugin(ScrollTrigger);
-
 /**
- * Contact Page Component with Premium Animations
- * Contact form with GSAP and Anime.js animations
- * Features: form validation, animated inputs, success feedback
+ * Contact Page - Interactive Form with Particle Effects
+ * Features: Magnetic inputs, particle animations, form validation
  */
 const Contact = () => {
-  const submitButtonRef = useMagneticButton(0.3);
+  const canvasRef = useRef(null);
   const formRef = useRef(null);
-  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     subject: '',
-    message: '',
+    message: ''
   });
-
-  const [formStatus, setFormStatus] = useState({
-    loading: false,
-    success: false,
-    error: '',
-  });
-
-  const [formErrors, setFormErrors] = useState({});
-
-  // GSAP form animations on mount
-  useEffect(() => {
-    if (!formRef.current) return;
-
-    const inputs = formRef.current.querySelectorAll('.form-group');
-    const contactCards = document.querySelectorAll('.contact-info-card');
-
-    // Animate form inputs
-    gsap.fromTo(inputs, 
-      { 
-        opacity: 0, 
-        y: 50,
-        rotationX: -15 
-      },
-      {
-        opacity: 1,
-        y: 0,
-        rotationX: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: formRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none reverse'
-        }
-      }
-    );
-
-    // Animate contact info cards
-    gsap.fromTo(contactCards,
-      {
-        opacity: 0,
-        x: -50,
-        scale: 0.9
-      },
-      {
-        opacity: 1,
-        x: 0,
-        scale: 1,
-        duration: 0.8,
-        ease: 'back.out(1.7)',
-        stagger: 0.15,
-        scrollTrigger: {
-          trigger: '.contact-info',
-          start: 'top 80%',
-          toggleActions: 'play none none reverse'
-        }
-      }
-    );
-
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
-  }, []);
-
-  // Form validation
-  const validateForm = () => {
-    const errors = {};
-
-    if (!formData.name.trim()) {
-      errors.name = 'Name is required';
-    }
-
-    if (!formData.email.trim()) {
-      errors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Please enter a valid email';
-    }
-
-    if (!formData.subject.trim()) {
-      errors.subject = 'Subject is required';
-    }
-
-    if (!formData.message.trim()) {
-      errors.message = 'Message is required';
-    } else if (formData.message.trim().length < 10) {
-      errors.message = 'Message must be at least 10 characters';
-    }
-
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  // Handle input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Clear error for this field
-    if (formErrors[name]) {
-      setFormErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  // Anime.js input focus animations
-  const handleInputFocus = (e) => {
-    animate(e.target, {
-      borderColor: '#667eea',
-      boxShadow: '0 0 0 3px rgba(102, 126, 234, 0.1)',
-      scale: 1.01,
-      duration: 300,
-      ease: 'out-cubic'
-    });
-  };
-
-  const handleInputBlur = (e) => {
-    animate(e.target, {
-      borderColor: 'rgba(255, 255, 255, 0.1)',
-      boxShadow: '0 0 0 0px rgba(102, 126, 234, 0)',
-      scale: 1,
-      duration: 300,
-      ease: 'out-cubic'
-    });
-  };
-
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setFormStatus({ loading: true, success: false, error: '' });
-
-    try {
-      const response = await fetch('http://localhost:5000/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setFormStatus({ loading: false, success: true, error: '' });
-        setFormData({ name: '', email: '', subject: '', message: '' });
-        
-        // Success animation
-        const successMsg = document.querySelector('.success-message');
-        if (successMsg) {
-          animate(successMsg, {
-            scale: [0, 1],
-            opacity: [0, 1],
-            duration: 500,
-            ease: 'out-elastic(1, 0.5)'
-          });
-        }
-        
-        // Reset success message after 5 seconds
-        setTimeout(() => {
-          setFormStatus(prev => ({ ...prev, success: false }));
-        }, 5000);
-      } else {
-        throw new Error(data.message || 'Failed to send message');
-      }
-    } catch (error) {
-      setFormStatus({
-        loading: false,
-        success: false,
-        error: error.message || 'Failed to send message. Please try again.',
-      });
-      
-      // Error shake animation
-      if (formRef.current) {
-        animate(formRef.current, {
-          translateX: [0, -10, 10, -10, 10, 0],
-          duration: 500,
-          ease: 'in-out-sine'
-        });
-      }
-    }
-  };
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+  const [focusedField, setFocusedField] = useState(null);
 
   const contactInfo = [
     {
       icon: <FaEnvelope />,
       label: 'Email',
-      value: 'your.email@example.com',
-      link: 'mailto:your.email@example.com',
+      value: 'dhruv.sonagra@example.com',
+      link: 'mailto:dhruv.sonagra@example.com',
+      color: '#00d4ff'
     },
     {
       icon: <FaPhone />,
       label: 'Phone',
-      value: '+1 (234) 567-8900',
-      link: 'tel:+12345678900',
+      value: '+91 98765 43210',
+      link: 'tel:+919876543210',
+      color: '#10b981'
     },
     {
       icon: <FaMapMarkerAlt />,
       label: 'Location',
-      value: 'City, Country',
-      link: null,
-    },
+      value: 'Mumbai, India',
+      link: '#',
+      color: '#f43f5e'
+    }
   ];
+
+  const socialLinks = [
+    { icon: <FaGithub />, url: 'https://github.com', label: 'GitHub', color: '#333' },
+    { icon: <FaLinkedin />, url: 'https://linkedin.com', label: 'LinkedIn', color: '#0077b5' },
+    { icon: <FaTwitter />, url: 'https://twitter.com', label: 'Twitter', color: '#1da1f2' },
+    { icon: <FaInstagram />, url: 'https://instagram.com', label: 'Instagram', color: '#e4405f' }
+  ];
+
+  // Particle animation for canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    let animationId;
+    let particles = [];
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Create particles
+    for (let i = 0; i < 30; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        radius: Math.random() * 3 + 1,
+        color: ['#00d4ff', '#8b5cf6', '#f43f5e'][Math.floor(Math.random() * 3)]
+      });
+    }
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color + '40';
+        ctx.fill();
+      });
+
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      const response = await fetch("https://formspree.io/f/mldleroq", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+      setTimeout(() => setSubmitStatus(null), 5000);
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
 
   return (
     <>
       <Helmet>
-        <title>Contact | Your Name - Get In Touch</title>
-        <meta name="description" content="Get in touch with me for collaboration opportunities, project inquiries, or just to say hello. I'm always open to discussing new projects." />
-        <meta property="og:title" content="Contact | Your Name" />
-        <meta property="og:description" content="Get in touch for collaboration opportunities" />
-        <link rel="canonical" href="https://yourportfolio.com/contact" />
+        <title>Contact | Dhruv Sonagra</title>
+        <meta name="description" content="Get in touch for collaborations, opportunities, or just to say hello." />
       </Helmet>
 
-      <main className="contact">
-        <div className="contact-container">
-          {/* Page Header */}
+      <main className="contact" style={{ paddingTop: '120px' }}>
+        {/* Header */}
+        <section className="container" style={{ marginBottom: '4rem' }}>
           <motion.div
-            className="page-header"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            style={{ textAlign: 'center' }}
           >
-            <h1 className="gradient-text">Get In Touch</h1>
-            <p className="page-subtitle">Let's work together on your next project</p>
+            <span style={{
+              display: 'inline-block',
+              padding: '0.5rem 1rem',
+              background: 'rgba(16, 185, 129, 0.1)',
+              border: '1px solid rgba(16, 185, 129, 0.2)',
+              borderRadius: '9999px',
+              fontSize: '0.875rem',
+              color: '#10b981',
+              marginBottom: '1.5rem'
+            }}>
+              Get In Touch
+            </span>
+            <h1 style={{
+              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+              fontWeight: 700,
+              marginBottom: '1rem'
+            }}>
+              Let's{' '}
+              <span style={{
+                background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}>
+                Connect
+              </span>
+            </h1>
+            <p style={{
+              fontSize: '1.125rem',
+              color: '#94a3b8',
+              maxWidth: '600px',
+              margin: '0 auto'
+            }}>
+              Have a project in mind or want to collaborate? I'd love to hear from you.
+            </p>
           </motion.div>
+        </section>
 
-          {/* Contact Content */}
-          <div className="contact-content">
-            {/* Contact Form */}
-            <motion.div
-              className="contact-form-container"
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <form onSubmit={handleSubmit} className="contact-form" ref={formRef}>
-                {/* Name Field */}
-                <div className="form-group">
-                  <label htmlFor="name" className="form-label">Name *</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    onFocus={handleInputFocus}
-                    onBlur={handleInputBlur}
-                    className={`form-input ${formErrors.name ? 'error' : ''}`}
-                    placeholder="Your name"
-                  />
-                  {formErrors.name && (
-                    <span className="form-error">{formErrors.name}</span>
-                  )}
+        {/* Contact Grid */}
+        <section className="container" style={{ marginBottom: '6rem' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1.5fr',
+            gap: '4rem'
+          }}>
+            {/* Contact Info */}
+            <div>
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <h2 style={{
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  marginBottom: '1.5rem'
+                }}>
+                  Contact Information
+                </h2>
+                <p style={{
+                  color: '#64748b',
+                  marginBottom: '2rem',
+                  lineHeight: 1.7
+                }}>
+                  Feel free to reach out through any of these channels. 
+                  I'm always open to discussing new projects and opportunities.
+                </p>
+
+                {/* Contact Cards */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+                  {contactInfo.map((info, index) => (
+                    <motion.a
+                      key={info.label}
+                      href={info.link}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 + index * 0.1 }}
+                      className="magnetic"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem',
+                        padding: '1.25rem',
+                        background: 'linear-gradient(145deg, rgba(20, 29, 51, 0.6) 0%, rgba(10, 14, 26, 0.8) 100%)',
+                        border: '1px solid rgba(255, 255, 255, 0.05)',
+                        borderRadius: '1rem',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      <div style={{
+                        width: '48px',
+                        height: '48px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: `${info.color}15`,
+                        borderRadius: '12px',
+                        fontSize: '1.25rem',
+                        color: info.color
+                      }}>
+                        {info.icon}
+                      </div>
+                      <div>
+                        <div style={{
+                          fontSize: '0.75rem',
+                          color: '#64748b',
+                          textTransform: 'uppercase',
+                          letterSpacing: '1px',
+                          marginBottom: '0.25rem'
+                        }}>
+                          {info.label}
+                        </div>
+                        <div style={{ fontWeight: 500 }}>
+                          {info.value}
+                        </div>
+                      </div>
+                    </motion.a>
+                  ))}
                 </div>
 
-                {/* Email Field */}
-                <div className="form-group">
-                  <label htmlFor="email" className="form-label">Email *</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    onFocus={handleInputFocus}
-                    onBlur={handleInputBlur}
-                    className={`form-input ${formErrors.email ? 'error' : ''}`}
-                    placeholder="your.email@example.com"
-                  />
-                  {formErrors.email && (
-                    <span className="form-error">{formErrors.email}</span>
-                  )}
+                {/* Social Links */}
+                <div>
+                  <h3 style={{
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    marginBottom: '1rem',
+                    color: '#64748b'
+                  }}>
+                    Follow Me
+                  </h3>
+                  <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    {socialLinks.map((social, index) => (
+                      <motion.a
+                        key={social.label}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.5 + index * 0.1 }}
+                        className="magnetic"
+                        style={{
+                          width: '44px',
+                          height: '44px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: '50%',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          color: '#94a3b8',
+                          fontSize: '1.125rem',
+                          transition: 'all 0.3s ease'
+                        }}
+                        whileHover={{
+                          borderColor: social.color,
+                          color: social.color,
+                          scale: 1.1
+                        }}
+                      >
+                        {social.icon}
+                      </motion.a>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Contact Form */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              style={{
+                position: 'relative',
+                padding: '2.5rem',
+                background: 'linear-gradient(145deg, rgba(20, 29, 51, 0.6) 0%, rgba(10, 14, 26, 0.8) 100%)',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRadius: '1.5rem',
+                overflow: 'hidden'
+              }}
+            >
+              {/* Particle Canvas */}
+              <canvas
+                ref={canvasRef}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  pointerEvents: 'none',
+                  opacity: 0.5
+                }}
+              />
+
+              <form ref={formRef} onSubmit={handleSubmit} style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                  {/* Name Field */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      marginBottom: '0.5rem',
+                      color: focusedField === 'name' ? '#00d4ff' : '#94a3b8',
+                      transition: 'color 0.3s ease'
+                    }}>
+                      Your Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      onFocus={() => setFocusedField('name')}
+                      onBlur={() => setFocusedField(null)}
+                      required
+                      className="magnetic"
+                      style={{
+                        width: '100%',
+                        padding: '1rem 1.25rem',
+                        background: 'rgba(10, 14, 26, 0.5)',
+                        border: `1px solid ${focusedField === 'name' ? '#00d4ff' : 'rgba(255, 255, 255, 0.1)'}`,
+                        borderRadius: '0.75rem',
+                        color: '#fff',
+                        fontSize: '1rem',
+                        outline: 'none',
+                        transition: 'all 0.3s ease'
+                      }}
+                      placeholder="John Doe"
+                    />
+                  </div>
+
+                  {/* Email Field */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      marginBottom: '0.5rem',
+                      color: focusedField === 'email' ? '#00d4ff' : '#94a3b8',
+                      transition: 'color 0.3s ease'
+                    }}>
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      onFocus={() => setFocusedField('email')}
+                      onBlur={() => setFocusedField(null)}
+                      required
+                      className="magnetic"
+                      style={{
+                        width: '100%',
+                        padding: '1rem 1.25rem',
+                        background: 'rgba(10, 14, 26, 0.5)',
+                        border: `1px solid ${focusedField === 'email' ? '#00d4ff' : 'rgba(255, 255, 255, 0.1)'}`,
+                        borderRadius: '0.75rem',
+                        color: '#fff',
+                        fontSize: '1rem',
+                        outline: 'none',
+                        transition: 'all 0.3s ease'
+                      }}
+                      placeholder="john@example.com"
+                    />
+                  </div>
                 </div>
 
                 {/* Subject Field */}
-                <div className="form-group">
-                  <label htmlFor="subject" className="form-label">Subject *</label>
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    marginBottom: '0.5rem',
+                    color: focusedField === 'subject' ? '#00d4ff' : '#94a3b8',
+                    transition: 'color 0.3s ease'
+                  }}>
+                    Subject
+                  </label>
                   <input
                     type="text"
-                    id="subject"
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
-                    onFocus={handleInputFocus}
-                    onBlur={handleInputBlur}
-                    className={`form-input ${formErrors.subject ? 'error' : ''}`}
-                    placeholder="What's this about?"
+                    onFocus={() => setFocusedField('subject')}
+                    onBlur={() => setFocusedField(null)}
+                    required
+                    className="magnetic"
+                    style={{
+                      width: '100%',
+                      padding: '1rem 1.25rem',
+                      background: 'rgba(10, 14, 26, 0.5)',
+                      border: `1px solid ${focusedField === 'subject' ? '#00d4ff' : 'rgba(255, 255, 255, 0.1)'}`,
+                      borderRadius: '0.75rem',
+                      color: '#fff',
+                      fontSize: '1rem',
+                      outline: 'none',
+                      transition: 'all 0.3s ease'
+                    }}
+                    placeholder="Project Collaboration"
                   />
-                  {formErrors.subject && (
-                    <span className="form-error">{formErrors.subject}</span>
-                  )}
                 </div>
 
                 {/* Message Field */}
-                <div className="form-group">
-                  <label htmlFor="message" className="form-label">Message *</label>
+                <div style={{ marginBottom: '2rem' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    marginBottom: '0.5rem',
+                    color: focusedField === 'message' ? '#00d4ff' : '#94a3b8',
+                    transition: 'color 0.3s ease'
+                  }}>
+                    Message
+                  </label>
                   <textarea
-                    id="message"
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    onFocus={handleInputFocus}
-                    onBlur={handleInputBlur}
-                    className={`form-textarea ${formErrors.message ? 'error' : ''}`}
-                    placeholder="Your message..."
-                    rows="6"
+                    onFocus={() => setFocusedField('message')}
+                    onBlur={() => setFocusedField(null)}
+                    required
+                    rows={5}
+                    className="magnetic"
+                    style={{
+                      width: '100%',
+                      padding: '1rem 1.25rem',
+                      background: 'rgba(10, 14, 26, 0.5)',
+                      border: `1px solid ${focusedField === 'message' ? '#00d4ff' : 'rgba(255, 255, 255, 0.1)'}`,
+                      borderRadius: '0.75rem',
+                      color: '#fff',
+                      fontSize: '1rem',
+                      outline: 'none',
+                      resize: 'vertical',
+                      minHeight: '150px',
+                      transition: 'all 0.3s ease',
+                      fontFamily: 'inherit'
+                    }}
+                    placeholder="Tell me about your project..."
                   />
-                  {formErrors.message && (
-                    <span className="form-error">{formErrors.message}</span>
-                  )}
                 </div>
 
                 {/* Submit Button */}
-                <button
-                  ref={submitButtonRef}
+                <motion.button
                   type="submit"
-                  className="btn btn-primary btn-magnetic submit-btn"
-                  disabled={formStatus.loading}
+                  disabled={isSubmitting}
+                  className="btn btn-primary magnetic"
+                  style={{
+                    width: '100%',
+                    padding: '1rem 2rem',
+                    fontSize: '1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    opacity: isSubmitting ? 0.7 : 1,
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer'
+                  }}
+                  whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+                  whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
                 >
-                  {formStatus.loading ? (
+                  {isSubmitting ? (
                     <>
-                      <div className="spinner"></div>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                        style={{
+                          width: '20px',
+                          height: '20px',
+                          border: '2px solid transparent',
+                          borderTopColor: '#fff',
+                          borderRadius: '50%'
+                        }}
+                      />
                       Sending...
                     </>
                   ) : (
@@ -359,78 +547,76 @@ const Contact = () => {
                       Send Message
                     </>
                   )}
-                </button>
+                </motion.button>
 
-                {/* Success Message */}
-                {formStatus.success && (
+                {/* Status Messages */}
+                {submitStatus && (
                   <motion.div
-                    className="form-success"
-                    initial={{ opacity: 0, y: -10 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
+                    style={{
+                      marginTop: '1rem',
+                      padding: '1rem',
+                      background: submitStatus === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)',
+                      border: `1px solid ${submitStatus === 'success' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(244, 63, 94, 0.3)'}`,
+                      borderRadius: '0.75rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      color: submitStatus === 'success' ? '#10b981' : '#f43f5e'
+                    }}
                   >
-                    ✓ Message sent successfully! I'll get back to you soon.
-                  </motion.div>
-                )}
-
-                {/* Error Message */}
-                {formStatus.error && (
-                  <motion.div
-                    className="form-error-message"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    ✗ {formStatus.error}
+                    {submitStatus === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
+                    {submitStatus === 'success' 
+                      ? 'Message sent successfully! I\'ll get back to you soon.' 
+                      : 'Something went wrong. Please try again.'}
                   </motion.div>
                 )}
               </form>
             </motion.div>
-
-            {/* Contact Info */}
-            <motion.div
-              className="contact-info-container"
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <div className="contact-info-cards">
-                {contactInfo.map((info, index) => (
-                  <motion.div
-                    key={info.label}
-                    className="contact-info-card glass-card"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 + index * 0.1 }}
-                    whileHover={{ y: -5 }}
-                  >
-                    <div className="contact-info-icon">{info.icon}</div>
-                    <h3>{info.label}</h3>
-                    {info.link ? (
-                      <a href={info.link} className="contact-info-value">
-                        {info.value}
-                      </a>
-                    ) : (
-                      <p className="contact-info-value">{info.value}</p>
-                    )}
-                  </motion.div>
-                ))}
-
-                {/* Availability Badge */}
-                <motion.div
-                  className="availability-badge glass-card"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.8 }}
-                >
-                  <div className="availability-indicator pulse"></div>
-                  <div>
-                    <h4>Currently Available</h4>
-                    <p>Open for new opportunities</p>
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
           </div>
-        </div>
+        </section>
+
+        {/* Availability Banner */}
+        <section className="container" style={{ paddingBottom: '6rem' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            style={{
+              padding: '2rem',
+              background: 'linear-gradient(90deg, rgba(0, 212, 255, 0.1), rgba(139, 92, 246, 0.1))',
+              border: '1px solid rgba(0, 212, 255, 0.2)',
+              borderRadius: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '1rem'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{
+                width: '12px',
+                height: '12px',
+                background: '#10b981',
+                borderRadius: '50%',
+                animation: 'pulse 2s infinite'
+              }} />
+              <div>
+                <h3 style={{ fontWeight: 600, marginBottom: '0.25rem' }}>
+                  Available for freelance work
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: '#64748b' }}>
+                  Currently accepting new projects for Q1 2025
+                </p>
+              </div>
+            </div>
+            <a href="mailto:dhruv.sonagra@example.com" className="btn btn-primary">
+              Schedule a Call
+            </a>
+          </motion.div>
+        </section>
       </main>
     </>
   );
