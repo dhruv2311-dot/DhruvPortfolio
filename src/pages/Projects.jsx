@@ -3,11 +3,19 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { Helmet } from 'react-helmet-async';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectCoverflow, Pagination, Navigation, Autoplay } from 'swiper/modules';
 import { 
   FaGithub, FaExternalLinkAlt, FaFigma, FaTimes,
   FaReact, FaNodeJs, FaDatabase, FaAws
 } from 'react-icons/fa';
 import { SiNextdotjs, SiTypescript, SiMongodb, SiTailwindcss } from 'react-icons/si';
+
+// Swiper styles
+import 'swiper/css';
+import 'swiper/css/effect-coverflow';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 import './Projects.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -19,8 +27,7 @@ gsap.registerPlugin(ScrollTrigger);
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedProject, setSelectedProject] = useState(null);
-  const containerRef = useRef(null);
-  const horizontalRef = useRef(null);
+  const [hoveredProject, setHoveredProject] = useState(null);
 
   const categories = ['All', 'HTML/CSS', 'MERN', 'Figma', 'Hackathons'];
 
@@ -113,34 +120,6 @@ const Projects = () => {
 
   const featuredProjects = projects.filter(p => p.featured);
 
-  // Helper for hover state
-  const [hoveredProject, setHoveredProject] = useState(null);
-
-  // Horizontal scroll animation
-  useEffect(() => {
-    const container = horizontalRef.current;
-    if (!container) return;
-
-    const scrollWidth = container.scrollWidth - window.innerWidth;
-
-    gsap.to(container, {
-      x: -scrollWidth,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: 'center center',
-        end: () => `+=${scrollWidth}`,
-        scrub: 1,
-        pin: true,
-        anticipatePin: 1
-      }
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach(st => st.kill());
-    };
-  }, []);
-
   return (
     <>
       <Helmet>
@@ -194,81 +173,121 @@ const Projects = () => {
           </motion.div>
         </section>
 
-        {/* Horizontal Scroll Featured Projects */}
-        <section ref={containerRef} style={{ marginBottom: '6rem' }}>
-          <div 
-            ref={horizontalRef}
+        {/* Featured Projects Carousel - Swiper */}
+        <section style={{ marginBottom: '6rem', padding: '0 2rem' }}>
+          <Swiper
+            effect={'coverflow'}
+            grabCursor={true}
+            centeredSlides={true}
+            slidesPerView={'auto'}
+            coverflowEffect={{
+              rotate: 50,
+              stretch: 0,
+              depth: 100,
+              modifier: 1,
+              slideShadows: true,
+            }}
+            pagination={{
+              clickable: true,
+              dynamicBullets: true,
+            }}
+            navigation={true}
+            autoplay={{
+              delay: 3500,
+              disableOnInteraction: false,
+            }}
+            modules={[EffectCoverflow, Pagination, Navigation, Autoplay]}
+            className="featured-projects-swiper"
             style={{
-              display: 'flex',
-              gap: '2rem',
-              padding: '0 4rem'
+              paddingBottom: '3rem'
             }}
           >
             {featuredProjects.map((project) => (
-              <motion.div
+              <SwiperSlide 
                 key={project.id}
-                className="project-card-featured"
                 style={{
-                  minWidth: '600px',
+                  maxWidth: '600px',
                   height: '450px',
-                  position: 'relative',
-                  borderRadius: '1.5rem',
-                  overflow: 'hidden',
-                  cursor: 'pointer'
                 }}
-                onClick={() => setSelectedProject(project)}
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.3 }}
               >
-                <img
-                  src={project.image}
-                  alt={project.title}
+                <motion.div
+                  className="project-card-featured"
                   style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover'
+                    position: 'relative',
+                    borderRadius: '1.5rem',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
                   }}
-                />
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(180deg, transparent 0%, rgba(10, 14, 26, 0.95) 100%)',
-                  padding: '2rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-end'
-                }}>
-                  <span style={{
-                    display: 'inline-block',
-                    padding: '0.375rem 0.875rem',
-                    background: 'rgba(0, 212, 255, 0.2)',
-                    border: '1px solid rgba(0, 212, 255, 0.3)',
-                    borderRadius: '9999px',
-                    fontSize: '0.75rem',
-                    color: '#00d4ff',
-                    marginBottom: '1rem',
-                    width: 'fit-content'
+                  onClick={() => setSelectedProject(project)}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(180deg, transparent 0%, rgba(10, 14, 26, 0.95) 100%)',
+                    padding: '2rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end'
                   }}>
-                    {project.category}
-                  </span>
-                  <h3 style={{
-                    fontSize: '1.75rem',
-                    fontWeight: 700,
-                    marginBottom: '0.75rem'
-                  }}>
-                    {project.title}
-                  </h3>
-                  <p style={{
-                    color: '#94a3b8',
-                    marginBottom: '1rem',
-                    lineHeight: 1.6
-                  }}>
-                    {project.description}
-                  </p>
-                </div>
-              </motion.div>
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '0.375rem 0.875rem',
+                      background: 'rgba(0, 212, 255, 0.2)',
+                      border: '1px solid rgba(0, 212, 255, 0.3)',
+                      borderRadius: '9999px',
+                      fontSize: '0.75rem',
+                      color: '#00d4ff',
+                      marginBottom: '1rem',
+                      width: 'fit-content'
+                    }}>
+                      {project.category}
+                    </span>
+                    <h3 style={{
+                      fontSize: '1.75rem',
+                      fontWeight: 700,
+                      marginBottom: '0.75rem'
+                    }}>
+                      {project.title}
+                    </h3>
+                    <p style={{
+                      color: '#94a3b8',
+                      marginBottom: '1rem',
+                      lineHeight: 1.6
+                    }}>
+                      {project.description}
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      {project.tech.slice(0, 4).map((tech, i) => (
+                        <span key={i} style={{
+                          fontSize: '0.7rem',
+                          background: 'rgba(255,255,255,0.1)',
+                          padding: '0.25rem 0.5rem',
+                          borderRadius: '4px',
+                          color: '#cbd5e1'
+                        }}>
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              </SwiperSlide>
             ))}
-          </div>
+          </Swiper>
         </section>
 
         {/* Filter & Grid */}
