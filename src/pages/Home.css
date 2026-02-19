@@ -335,3 +335,39 @@
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+/* ===================================
+   SPLITTING.JS TEXT ANIMATIONS
+   =================================== */
+
+/* Character animation with 3D effects */
+.char {
+  display: inline-block;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  transition: all 0.3s ease;
+}
+
+.char:hover {
+  color: #00d4ff;
+  transform: translateY(-3px) rotateY(10deg) scale(1.1);
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+}
+
+/* Word animation for subtitle */
+.word {
+  display: inline-block;
+  margin-right: 0.3em;
+  transition: all 0.3s ease;
+}
+
+.word:hover {
+  transform: scale(1.05);
+  filter: brightness(1.3);
+}
+
+/* Line animation */
+.line {
+  display: block;
+  overflow: hidden;
+}
