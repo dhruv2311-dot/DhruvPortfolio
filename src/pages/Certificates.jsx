@@ -1,12 +1,19 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectCards, Pagination, Autoplay } from 'swiper/modules';
 import { 
   FaCertificate, FaExternalLinkAlt, FaAward, FaMedal,
   FaGoogle, FaMicrosoft, FaAws, FaReact, FaCloud,
   FaJs, FaTrophy, FaUniversity, FaCode, FaGithub
 } from 'react-icons/fa';
 import { SiOracle, SiMongodb, SiNodedotjs } from 'react-icons/si';
+
+// Swiper styles
+import 'swiper/css';
+import 'swiper/css/effect-cards';
+import 'swiper/css/pagination';
 import './Certificates.css';
 
 /**
@@ -208,9 +215,11 @@ const Certificates = () => {
     ? certificates 
     : certificates.filter(c => c.category === activeFilter);
 
+  const featuredCerts = certificates.filter(c => c.featured);
+
   const stats = [
     { label: 'Total Certificates', value: certificates.length },
-    { label: 'Featured', value: certificates.filter(c => c.featured).length },
+    { label: 'Featured', value: featuredCerts.length },
     { label: 'Categories', value: categories.length - 1 }
   ];
 
@@ -306,6 +315,154 @@ const Certificates = () => {
               </motion.div>
             ))}
           </div>
+        </section>
+
+        {/* Featured Certificates Carousel */}
+        <section className="container" style={{ marginBottom: '4rem' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            style={{ marginBottom: '2rem', textAlign: 'center' }}
+          >
+            <h2 style={{
+              fontSize: '2rem',
+              fontWeight: 700,
+              marginBottom: '0.5rem'
+            }}>
+              Featured <span style={{
+                background: 'linear-gradient(90deg, #f43f5e, #8b5cf6)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}>Achievements</span>
+            </h2>
+            <p style={{ color: '#94a3b8', fontSize: '1rem' }}>
+              Swipe to explore my most recent certifications
+            </p>
+          </motion.div>
+
+          <Swiper
+            effect={'cards'}
+            grabCursor={true}
+            modules={[EffectCards, Pagination, Autoplay]}
+            pagination={{
+              clickable: true,
+              dynamicBullets: true,
+            }}
+            autoplay={{
+              delay: 3000,
+              disableOnInteraction: false,
+            }}
+            className="featured-certs-swiper"
+            style={{
+              maxWidth: '400px',
+              margin: '0 auto',
+              paddingBottom: '3rem'
+            }}
+          >
+            {featuredCerts.map((cert) => (
+              <SwiperSlide key={cert.id}>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    height: '500px',
+                    borderRadius: '1.5rem',
+                    overflow: 'hidden',
+                    background: 'linear-gradient(145deg, rgba(20, 29, 51, 0.9) 0%, rgba(10, 14, 26, 0.95) 100%)',
+                    border: `2px solid ${cert.color}`,
+                    boxShadow: `0 20px 60px ${cert.color}40`
+                  }}
+                >
+                  <div style={{
+                    height: '60%',
+                    overflow: 'hidden',
+                    position: 'relative'
+                  }}>
+                    <img
+                      src={cert.image}
+                      alt={cert.title}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                      }}
+                    />
+                    <div style={{
+                      position: 'absolute',
+                      top: '1rem',
+                      right: '1rem',
+                      width: '50px',
+                      height: '50px',
+                      borderRadius: '50%',
+                      background: cert.color,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.5rem',
+                      color: '#fff',
+                      boxShadow: `0 0 20px ${cert.color}80`
+                    }}>
+                      {cert.icon}
+                    </div>
+                  </div>
+                  
+                  <div style={{ padding: '1.5rem' }}>
+                    <div style={{
+                      fontSize: '0.75rem',
+                      color: cert.color,
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      marginBottom: '0.5rem'
+                    }}>
+                      {cert.issuer} • {cert.date}
+                    </div>
+                    
+                    <h3 style={{
+                      fontSize: '1.25rem',
+                      fontWeight: 700,
+                      marginBottom: '0.75rem',
+                      lineHeight: 1.3
+                    }}>
+                      {cert.title}
+                    </h3>
+                    
+                    <p style={{
+                      fontSize: '0.875rem',
+                      color: '#94a3b8',
+                      lineHeight: 1.6,
+                      marginBottom: '1rem'
+                    }}>
+                      {cert.description.slice(0, 80)}...
+                    </p>
+                    
+                    <a
+                      href={cert.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.5rem 1rem',
+                        background: cert.color,
+                        color: '#fff',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: 600,
+                        textDecoration: 'none',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      <FaExternalLinkAlt />
+                      View Certificate
+                    </a>
+                  </div>
+                </motion.div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </section>
 
         {/* Filter */}
