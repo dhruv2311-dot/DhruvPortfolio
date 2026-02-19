@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { gsap } from 'gsap';
+import { useSpring, animated, config } from '@react-spring/web';
 import { 
   FaEnvelope, FaPhone, FaMapMarkerAlt, FaGithub,
   FaLinkedin, FaTwitter, FaInstagram, FaPaperPlane,
@@ -147,6 +148,25 @@ const Contact = () => {
       [e.target.name]: e.target.value
     }));
   };
+
+  // React Spring animations for form interactions
+  const submitButtonSpring = useSpring({
+    scale: isSubmitting ? 0.95 : 1,
+    opacity: isSubmitting ? 0.7 : 1,
+    config: config.wobbly
+  });
+
+  const successSpring = useSpring({
+    opacity: submitStatus === 'success' ? 1 : 0,
+    transform: submitStatus === 'success' ? 'translateY(0px)' : 'translateY(-20px)',
+    config: config.gentle
+  });
+
+  const errorSpring = useSpring({
+    opacity: submitStatus === 'error' ? 1 : 0,
+    transform: submitStatus === 'error' ? 'translateY(0px)' : 'translateY(-20px)',
+    config: { ...config.wobbly, tension: 300 }
+  });
 
   return (
     <>
@@ -507,12 +527,13 @@ const Contact = () => {
                   />
                 </div>
 
-                {/* Submit Button */}
-                <motion.button
+                {/* Submit Button with React Spring */}
+                <animated.button
                   type="submit"
                   disabled={isSubmitting}
                   className="btn btn-primary magnetic"
                   style={{
+                    ...submitButtonSpring,
                     width: '100%',
                     padding: '1rem 2rem',
                     fontSize: '1rem',
@@ -520,11 +541,14 @@ const Contact = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '0.5rem',
-                    opacity: isSubmitting ? 0.7 : 1,
-                    cursor: isSubmitting ? 'not-allowed' : 'pointer'
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                    background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
+                    border: 'none',
+                    borderRadius: '0.75rem',
+                    color: '#fff',
+                    fontWeight: 600,
+                    transition: 'box-shadow 0.3s ease'
                   }}
-                  whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                  whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
                 >
                   {isSubmitting ? (
                     <>
@@ -547,30 +571,51 @@ const Contact = () => {
                       Send Message
                     </>
                   )}
-                </motion.button>
+                </animated.button>
 
-                {/* Status Messages */}
-                {submitStatus && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
+                {/* Status Messages with React Spring */}
+                {submitStatus === 'success' && (
+                  <animated.div
                     style={{
+                      ...successSpring,
                       marginTop: '1rem',
                       padding: '1rem',
-                      background: submitStatus === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)',
-                      border: `1px solid ${submitStatus === 'success' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(244, 63, 94, 0.3)'}`,
+                      background: 'rgba(16, 185, 129, 0.1)',
+                      border: '1px solid rgba(16, 185, 129, 0.3)',
                       borderRadius: '0.75rem',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.75rem',
-                      color: submitStatus === 'success' ? '#10b981' : '#f43f5e'
+                      color: '#10b981'
                     }}
                   >
-                    {submitStatus === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
-                    {submitStatus === 'success' 
-                      ? 'Message sent successfully! I\'ll get back to you soon.' 
-                      : 'Something went wrong. Please try again.'}
-                  </motion.div>
+                    <FaCheckCircle size={20} />
+                    <span style={{ fontWeight: 500 }}>
+                      Message sent successfully! I'll get back to you soon.
+                    </span>
+                  </animated.div>
+                )}
+                
+                {submitStatus === 'error' && (
+                  <animated.div
+                    style={{
+                      ...errorSpring,
+                      marginTop: '1rem',
+                      padding: '1rem',
+                      background: 'rgba(244, 63, 94, 0.1)',
+                      border: '1px solid rgba(244, 63, 94, 0.3)',
+                      borderRadius: '0.75rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      color: '#f43f5e'
+                    }}
+                  >
+                    <FaExclamationCircle size={20} />
+                    <span style={{ fontWeight: 500 }}>
+                      Something went wrong. Please try again.
+                    </span>
+                  </animated.div>
                 )}
               </form>
             </motion.div>
