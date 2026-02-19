@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { gsap } from 'gsap';
+import { useSpring, animated, config } from '@react-spring/web';
 import { FaGithub, FaLinkedin, FaTwitter, FaArrowDown, FaAws } from 'react-icons/fa';
 import { 
   SiReact, SiNodedotjs, SiTypescript, SiMongodb, SiPostgresql, 
@@ -10,6 +11,16 @@ import {
   SiDocker 
 } from 'react-icons/si';
 import './Home.css';
+
+// Dynamically import Splitting as optional enhancement
+let Splitting = null;
+try {
+  Splitting = require('splitting');
+  require('splitting/dist/splitting.css');
+  require('splitting/dist/splitting-cells.css');
+} catch (error) {
+  console.log('Splitting.js not available, using fallback animations');
+}
 
 /**
  * Home Page - Cinematic Hero Section
@@ -23,78 +34,164 @@ const Home = () => {
   const buttonsRef = useRef(null);
   const codeCardRef = useRef(null);
   const statsRef = useRef(null);
+  const [hoveredButton, setHoveredButton] = useState(null);
+
+  // React Spring for button hover effects
+  const primaryButtonSpring = useSpring({
+    scale: hoveredButton === 'primary' ? 1.05 : 1,
+    boxShadow: hoveredButton === 'primary' 
+      ? '0 20px 40px rgba(0, 212, 255, 0.4)' 
+      : '0 10px 20px rgba(0, 212, 255, 0.2)',
+    config: config.wobbly
+  });
+
+  const secondaryButtonSpring = useSpring({
+    scale: hoveredButton === 'secondary' ? 1.05 : 1,
+    boxShadow: hoveredButton === 'secondary' 
+      ? '0 20px 40px rgba(139, 92, 246, 0.4)' 
+      : '0 10px 20px rgba(139, 92, 246, 0.2)',
+    config: config.wobbly
+  });
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      // Animate name with character split
+      // Animate name with optional Splitting.js enhancement
       const nameEl = nameRef.current;
       if (nameEl) {
-        const text = nameEl.textContent;
-        nameEl.innerHTML = '';
-        text.split('').forEach((char, i) => {
-          const span = document.createElement('span');
-          span.textContent = char === ' ' ? '\u00A0' : char;
-          span.style.display = 'inline-block';
-          span.style.opacity = '0';
-          span.style.transform = 'translateY(100px) rotateX(-90deg)';
-          nameEl.appendChild(span);
-        });
-
-        tl.to(nameEl.children, {
-          opacity: 1,
-          y: 0,
-          rotateX: 0,
-          duration: 0.8,
-          stagger: 0.05,
-          ease: 'back.out(1.7)'
-        }, 0.3);
+        // Try to use Splitting if available
+        if (Splitting && typeof Splitting === 'function') {
+          try {
+            Splitting({ target: nameEl, by: 'chars' });
+            const chars = nameEl.querySelectorAll('.char');
+            
+            if (chars.length > 0) {
+              tl.from(chars, {
+                opacity: 0,
+                y: 100,
+                rotationX: -90,
+                transformOrigin: '50% 50% -50px',
+                duration: 0.8,
+                stagger: 0.03,
+                ease: 'back.out(1.7)'
+              }, 0.3);
+            } else {
+              // Fallback simple animation
+              tl.from(nameEl, {
+                opacity: 0,
+                y: 50,
+                duration: 1,
+                ease: 'back.out(1.7)'
+              }, 0.3);
+            }
+          } catch (error) {
+            console.warn('Splitting failed, using fallback:', error);
+            tl.from(nameEl, {
+              opacity: 0,
+              y: 50,
+              duration: 1,
+              ease: 'back.out(1.7)'
+            }, 0.3);
+          }
+        } else {
+          // Fallback animation without Splitting
+          tl.from(nameEl, {
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            ease: 'back.out(1.7)'
+          }, 0.3);
+        }
       }
 
-      // Animate role
-      tl.fromTo(roleRef.current,
-        { opacity: 0, y: 30, filter: 'blur(10px)' },
-        { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8 },
-        '-=0.4'
-      );
+      // Animate role text
+      const roleEl = roleRef.current;
+      if (roleEl) {
+        if (Splitting && typeof Splitting === 'function') {
+          try {
+            Splitting({ target: roleEl, by: 'words' });
+            const words = roleEl.querySelectorAll('.word');
+            
+            if (words.length > 0) {
+              tl.from(words, {
+                opacity: 0,
+                y: 30,
+                filter: 'blur(10px)',
+                duration: 0.8,
+                stagger: 0.1
+              }, '-=0.4');
+            } else {
+              tl.from(roleEl, {
+                opacity: 0,
+                y: 30,
+                duration: 0.8
+              }, '-=0.4');
+            }
+          } catch (error) {
+            tl.from(roleEl, {
+              opacity: 0,
+              y: 30,
+              duration: 0.8
+            }, '-=0.4');
+          }
+        } else {
+          tl.from(roleEl, {
+            opacity: 0,
+            y: 30,
+            duration: 0.8
+          }, '-=0.4');
+        }
+      }
 
       // Animate description
-      tl.fromTo(descRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.6 },
-        '-=0.4'
-      );
+      if (descRef.current) {
+        tl.from(descRef.current, {
+          opacity: 0,
+          y: 20,
+          duration: 0.6
+        }, '-=0.4');
+      }
 
       // Animate buttons
-      tl.fromTo(buttonsRef.current?.children || [],
-        { opacity: 0, y: 20, scale: 0.9 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.1 },
-        '-=0.3'
-      );
+      if (buttonsRef.current?.children) {
+        tl.from(buttonsRef.current.children, {
+          opacity: 0,
+          y: 20,
+          scale: 0.9,
+          duration: 0.5,
+          stagger: 0.1
+        }, '-=0.3');
+      }
 
       // Animate code card
-      tl.fromTo(codeCardRef.current,
-        { opacity: 0, x: 100, rotateY: 30 },
-        { opacity: 1, x: 0, rotateY: 0, duration: 1 },
-        '-=0.8'
-      );
+      if (codeCardRef.current) {
+        tl.from(codeCardRef.current, {
+          opacity: 0,
+          x: 100,
+          rotateY: 30,
+          duration: 1
+        }, '-=0.8');
+
+        // Floating animation for code card
+        gsap.to(codeCardRef.current, {
+          y: -15,
+          duration: 3,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut'
+        });
+      }
 
       // Animate stats
-      tl.fromTo(statsRef.current?.children || [],
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 },
-        '-=0.5'
-      );
-
-      // Floating animation for code card
-      gsap.to(codeCardRef.current, {
-        y: -15,
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut'
-      });
+      if (statsRef.current?.children) {
+        tl.from(statsRef.current.children, {
+          opacity: 0,
+          y: 20,
+          duration: 0.5,
+          stagger: 0.1
+        }, '-=0.5');
+      }
 
     }, containerRef);
 
@@ -204,12 +301,15 @@ const Home = () => {
               {/* Name */}
               <h1
                 ref={nameRef}
+                data-splitting
                 style={{
                   fontSize: 'clamp(2.5rem, 6vw, 5rem)',
                   fontWeight: 700,
                   lineHeight: 1.1,
                   marginBottom: '1rem',
-                  perspective: '1000px'
+                  perspective: '1000px',
+                  opacity: 1,
+                  visibility: 'visible'
                 }}
               >
                 Dhruv Sonagra
@@ -218,13 +318,16 @@ const Home = () => {
               {/* Role */}
               <h2
                 ref={roleRef}
+                data-splitting
                 style={{
                   fontSize: 'clamp(1.25rem, 3vw, 2rem)',
                   fontWeight: 600,
                   background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
-                  marginBottom: '1.5rem'
+                  marginBottom: '1.5rem',
+                  opacity: 1,
+                  visibility: 'visible'
                 }}
               >
                 Full-Stack Developer
@@ -245,14 +348,55 @@ const Home = () => {
                 solving complex problems through elegant code.
               </p>
 
-              {/* CTA Buttons */}
+              {/* CTA Buttons with React Spring */}
               <div ref={buttonsRef} style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-                <Link to="/projects" className="btn btn-primary magnetic">
-                  View My Work
-                </Link>
-                <Link to="/contact" className="btn btn-secondary magnetic">
-                  Get In Touch
-                </Link>
+                <animated.div style={primaryButtonSpring}>
+                  <Link 
+                    to="/projects" 
+                    className="btn btn-primary magnetic"
+                    onMouseEnter={() => setHoveredButton('primary')}
+                    onMouseLeave={() => setHoveredButton(null)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '1rem 2rem',
+                      background: 'linear-gradient(90deg, #00d4ff, #0099cc)',
+                      border: 'none',
+                      borderRadius: '0.75rem',
+                      color: '#0a0e1a',
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    View My Work
+                  </Link>
+                </animated.div>
+                
+                <animated.div style={secondaryButtonSpring}>
+                  <Link 
+                    to="/contact" 
+                    className="btn btn-secondary magnetic"
+                    onMouseEnter={() => setHoveredButton('secondary')}
+                    onMouseLeave={() => setHoveredButton(null)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '1rem 2rem',
+                      background: 'rgba(139, 92, 246, 0.1)',
+                      border: '1px solid rgba(139, 92, 246, 0.3)',
+                      borderRadius: '0.75rem',
+                      color: '#8b5cf6',
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    Get In Touch
+                  </Link>
+                </animated.div>
               </div>
 
               {/* Social Links */}
