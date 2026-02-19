@@ -343,9 +343,11 @@
 /* Character animation with 3D effects */
 .char {
   display: inline-block;
+  opacity: 1;
   transform-style: preserve-3d;
   perspective: 1000px;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+  will-change: transform, opacity;
 }
 
 .char:hover {
@@ -357,8 +359,10 @@
 /* Word animation for subtitle */
 .word {
   display: inline-block;
+  opacity: 1;
   margin-right: 0.3em;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  will-change: transform, opacity;
 }
 
 .word:hover {

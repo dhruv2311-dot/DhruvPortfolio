@@ -12,16 +12,6 @@ import {
 } from 'react-icons/si';
 import './Home.css';
 
-// Dynamically import Splitting as optional enhancement
-let Splitting = null;
-try {
-  Splitting = require('splitting');
-  require('splitting/dist/splitting.css');
-  require('splitting/dist/splitting-cells.css');
-} catch (error) {
-  console.log('Splitting.js not available, using fallback animations');
-}
-
 /**
  * Home Page - Cinematic Hero Section
  * Features: Particle text animation, floating code card, scroll indicators
@@ -57,91 +47,73 @@ const Home = () => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      // Animate name with optional Splitting.js enhancement
+      // Manual character splitting for name animation
       const nameEl = nameRef.current;
       if (nameEl) {
-        // Try to use Splitting if available
-        if (Splitting && typeof Splitting === 'function') {
-          try {
-            Splitting({ target: nameEl, by: 'chars' });
-            const chars = nameEl.querySelectorAll('.char');
-            
-            if (chars.length > 0) {
-              tl.from(chars, {
-                opacity: 0,
-                y: 100,
-                rotationX: -90,
-                transformOrigin: '50% 50% -50px',
-                duration: 0.8,
-                stagger: 0.03,
-                ease: 'back.out(1.7)'
-              }, 0.3);
-            } else {
-              // Fallback simple animation
-              tl.from(nameEl, {
-                opacity: 0,
-                y: 50,
-                duration: 1,
-                ease: 'back.out(1.7)'
-              }, 0.3);
-            }
-          } catch (error) {
-            console.warn('Splitting failed, using fallback:', error);
-            tl.from(nameEl, {
-              opacity: 0,
-              y: 50,
-              duration: 1,
-              ease: 'back.out(1.7)'
-            }, 0.3);
-          }
-        } else {
-          // Fallback animation without Splitting
-          tl.from(nameEl, {
+        const originalText = nameEl.getAttribute('data-text') || nameEl.textContent;
+        nameEl.setAttribute('data-text', originalText);
+        nameEl.innerHTML = '';
+        
+        // Split into characters and wrap in spans
+        originalText.split('').forEach((char) => {
+          const span = document.createElement('span');
+          span.textContent = char === ' ' ? '\u00A0' : char;
+          span.style.display = 'inline-block';
+          span.style.opacity = '1';
+          span.className = 'char';
+          nameEl.appendChild(span);
+        });
+
+        // Animate each character with fromTo for reliability
+        tl.fromTo(nameEl.querySelectorAll('.char'), 
+          {
             opacity: 0,
-            y: 50,
-            duration: 1,
+            y: 80,
+            rotationX: -80,
+            transformOrigin: '50% 50% -50px',
+          },
+          {
+            opacity: 1,
+            y: 0,
+            rotationX: 0,
+            duration: 0.8,
+            stagger: 0.03,
             ease: 'back.out(1.7)'
           }, 0.3);
-        }
       }
 
-      // Animate role text
+      // Manual word splitting for role animation
       const roleEl = roleRef.current;
       if (roleEl) {
-        if (Splitting && typeof Splitting === 'function') {
-          try {
-            Splitting({ target: roleEl, by: 'words' });
-            const words = roleEl.querySelectorAll('.word');
-            
-            if (words.length > 0) {
-              tl.from(words, {
-                opacity: 0,
-                y: 30,
-                filter: 'blur(10px)',
-                duration: 0.8,
-                stagger: 0.1
-              }, '-=0.4');
-            } else {
-              tl.from(roleEl, {
-                opacity: 0,
-                y: 30,
-                duration: 0.8
-              }, '-=0.4');
-            }
-          } catch (error) {
-            tl.from(roleEl, {
-              opacity: 0,
-              y: 30,
-              duration: 0.8
-            }, '-=0.4');
-          }
-        } else {
-          tl.from(roleEl, {
+        const originalText = roleEl.getAttribute('data-text') || roleEl.textContent;
+        roleEl.setAttribute('data-text', originalText);
+        roleEl.innerHTML = '';
+        
+        // Split into words and wrap in spans
+        originalText.split(' ').forEach((word, index) => {
+          const span = document.createElement('span');
+          span.textContent = word;
+          span.style.display = 'inline-block';
+          span.style.marginRight = '0.3em';
+          span.style.opacity = '1';
+          span.className = 'word';
+          roleEl.appendChild(span);
+        });
+
+        // Animate each word with fromTo for reliability
+        tl.fromTo(roleEl.querySelectorAll('.word'),
+          {
             opacity: 0,
             y: 30,
-            duration: 0.8
+            filter: 'blur(10px)',
+          },
+          {
+            opacity: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            duration: 0.8,
+            stagger: 0.1
           }, '-=0.4');
-        }
       }
 
       // Animate description
@@ -195,7 +167,18 @@ const Home = () => {
 
     }, containerRef);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      // Restore original text content to prevent issues on re-render
+      if (nameRef.current) {
+        const orig = nameRef.current.getAttribute('data-text');
+        if (orig) nameRef.current.textContent = orig;
+      }
+      if (roleRef.current) {
+        const orig = roleRef.current.getAttribute('data-text');
+        if (orig) roleRef.current.textContent = orig;
+      }
+    };
   }, []);
 
   const techStack = [
@@ -301,7 +284,6 @@ const Home = () => {
               {/* Name */}
               <h1
                 ref={nameRef}
-                data-splitting
                 style={{
                   fontSize: 'clamp(2.5rem, 6vw, 5rem)',
                   fontWeight: 700,
@@ -318,7 +300,6 @@ const Home = () => {
               {/* Role */}
               <h2
                 ref={roleRef}
-                data-splitting
                 style={{
                   fontSize: 'clamp(1.25rem, 3vw, 2rem)',
                   fontWeight: 600,
