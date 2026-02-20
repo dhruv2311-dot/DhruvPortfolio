@@ -1,60 +1,180 @@
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { 
-  FaGraduationCap, FaUniversity, FaCalendarAlt, 
-  FaAward, FaBook, FaCode
+import { useSpring, animated, config } from '@react-spring/web';
+import { useInView } from 'react-intersection-observer';
+import {
+  FaGraduationCap, FaUniversity, FaCalendarAlt,
+  FaAward, FaBook, FaCheckCircle
 } from 'react-icons/fa';
 import './Education.css';
 
-/**
- * Education Page - Academic Background & Courses
- * Features: Timeline layout, course cards, achievement highlights
- */
+// ── Framer Motion Variants ────────────────────────────────────
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.2 } }
+};
+
+const cardVariants = {
+  hidden:  { opacity: 0, x: -36 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } }
+};
+
+const highlightVariants = {
+  hidden:  { opacity: 0, x: -14 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } }
+};
+
+const highlightContainerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.15 } }
+};
+
+// ── Timeline Card ─────────────────────────────────────────────
+const TimelineCard = ({ edu }) => {
+  const [hovered, setHovered] = useState(false);
+
+  const cardSpring = useSpring({
+    transform: hovered ? 'translateY(-6px)' : 'translateY(0px)',
+    boxShadow: hovered
+      ? '0 24px 56px rgba(139,92,246,0.22), 0 0 0 1px rgba(139,92,246,0.22)'
+      : '0 4px 24px rgba(0,0,0,0.18)',
+    config: config.gentle
+  });
+
+  return (
+    <motion.div variants={cardVariants} className="edu-item">
+      {/* Timeline dot */}
+      <div className="edu-dot-col">
+        <div className="edu-dot">
+          <span className="edu-dot-icon">{edu.icon}</span>
+          <div className="edu-dot-pulse" />
+        </div>
+      </div>
+
+      {/* Card */}
+      <animated.div
+        className="edu-card"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          ...cardSpring,
+          border: `1px solid ${hovered ? 'rgba(139,92,246,0.28)' : 'rgba(255,255,255,0.06)'}`,
+          transition: 'border-color 0.3s ease'
+        }}
+      >
+        {/* Card header */}
+        <div className="edu-card-header">
+          <div>
+            <h3 className="edu-degree">{edu.degree}</h3>
+            <p className="edu-institution">
+              <FaUniversity style={{ marginRight: '0.4rem', opacity: 0.7 }} />
+              {edu.institution}
+              <span className="edu-location">, {edu.location}</span>
+            </p>
+          </div>
+          <span className="edu-date-badge">
+            <FaCalendarAlt style={{ opacity: 0.7 }} />
+            {edu.startDate} – {edu.endDate}
+          </span>
+        </div>
+
+        {/* Grade */}
+        {edu.grade && (
+          <div className="edu-grade-badge">
+            <FaAward />
+            {edu.grade}
+          </div>
+        )}
+
+        {/* Highlights — framer stagger */}
+        <motion.ul
+          className="edu-highlights"
+          variants={highlightContainerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          {edu.highlights.map((h, i) => (
+            <motion.li key={i} variants={highlightVariants}>
+              <FaCheckCircle className="edu-check" />
+              {h}
+            </motion.li>
+          ))}
+        </motion.ul>
+      </animated.div>
+    </motion.div>
+  );
+};
+
+// ── Timeline Line (CSS-only draw animation) ───────────────────
+const TimelineLine = () => {
+  const { ref, inView } = useInView({ threshold: 0.05, triggerOnce: true });
+
+  return (
+    <div
+      ref={ref}
+      className="edu-timeline-line"
+      style={{
+        transform: inView ? 'scaleY(1)' : 'scaleY(0)',
+        transformOrigin: 'top',
+        transition: 'transform 1.6s cubic-bezier(0.76, 0, 0.24, 1)'
+      }}
+    />
+  );
+};
+
+// ── Main Component ────────────────────────────────────────────
 const Education = () => {
+  const { ref, inView } = useInView({ threshold: 0.06, triggerOnce: true });
+  const { ref: headerRef, inView: headerInView } = useInView({ threshold: 0.3, triggerOnce: true });
+
   const education = [
     {
       id: 1,
-      degree: "Computer Science",
-      institution: "Rai University",
-      location: "Dholka, Ahmedabad, India",
-      startDate: "Aug 2024",
-      endDate: "Aug 2028",
+      degree: 'B.Tech — Computer Science',
+      institution: 'Rai University',
+      location: 'Dholka, Ahmedabad',
+      startDate: 'Aug 2024',
+      endDate: 'Aug 2028',
+      grade: '9.62 CGPA — Semester 1',
       highlights: [
-        "Strong foundation in both Frontend and Backend Web Development",
-        "Proficient in full-stack development with hands-on experience in HTML, CSS, JavaScript, React, Node.js, Express, and MongoDB",
-        "Skilled in basic problem solving, UI/UX design, and database management",
-        "Secured 9.62 CGPA in the first semester",
-        "Actively learning advanced web technologies and software engineering principles"
+        'Strong foundation in both Frontend and Backend Web Development',
+        'Full-stack expertise: HTML, CSS, JavaScript, React, Node.js, Express, MongoDB',
+        'UI/UX design, problem solving & database management',
+        'Active learner of advanced web technologies & software engineering principles'
       ],
       icon: <FaUniversity />
     },
     {
       id: 2,
-      degree: "Higher Secondary Education (Science)",
-      institution: "Vivekanand Science Academy",
-      location: "Halvad, Dhrangadhra, India",
-      startDate: "Jun 2022",
-      endDate: "Mar 2024",
+      degree: 'Higher Secondary — Science Stream',
+      institution: 'Vivekanand Science Academy',
+      location: 'Halvad, Dhrangadhra',
+      startDate: 'Jun 2022',
+      endDate: 'Mar 2024',
+      grade: '75.66% — 72 Percentile',
       highlights: [
-        "Completed 12th grade with Science stream focusing on Physics, Chemistry, and Mathematics",
-        "Achieved 75.66% and secured a 72 percentile in board examinations",
-        "Built a strong academic foundation for engineering and computer science",
-        "Participated in various science fairs and school tech activities"
+        'Science stream: Physics, Chemistry & Mathematics',
+        'Secured 75.66% and 72 percentile in board examinations',
+        'Strong academic foundation for Engineering and CS',
+        'Participated in science fairs and school tech events'
       ],
       icon: <FaGraduationCap />
     },
     {
       id: 3,
-      degree: "Secondary School Certificate (SSC)",
-      institution: "Sunrise Smart School",
-      location: "Dhrangadhra, Surendranagar, India",
-      startDate: "Jun 2021",
-      endDate: "Mar 2022",
+      degree: 'Secondary School Certificate (SSC)',
+      institution: 'Sunrise Smart School',
+      location: 'Dhrangadhra, Surendranagar',
+      startDate: 'Jun 2021',
+      endDate: 'Mar 2022',
+      grade: '91% — 98.66 Percentile — A1 Grade',
       highlights: [
-        "Achieved outstanding academic results with 91% and 98.66 percentile",
-        "Awarded A1 grade for exceptional performance in all subjects",
-        "Demonstrated strong aptitude in Mathematics and Science",
-        "Recognized for discipline and consistent academic excellence"
+        'Outstanding academic results: 91% with 98.66 percentile',
+        'Awarded A1 grade — exceptional performance in all subjects',
+        'Strong aptitude in Mathematics and Science',
+        'Recognized for discipline and consistent academic excellence'
       ],
       icon: <FaBook />
     }
@@ -64,193 +184,52 @@ const Education = () => {
     <>
       <Helmet>
         <title>Education | Dhruv Sonagra</title>
-        <meta name="description" content="My academic background, degrees, and continuous learning through online courses." />
+        <meta name="description" content="Academic background of Dhruv Sonagra — from Computer Science degree to school excellence." />
       </Helmet>
 
-      <main className="education" style={{ paddingTop: '120px' }}>
-        {/* Header */}
-        <section className="container" style={{ marginBottom: '4rem' }}>
+      <main className="edu-page" style={{ paddingTop: '120px', minHeight: '100vh' }}>
+        <div className="container">
+
+          {/* ── Header ──────────────────────────────────── */}
           <motion.div
+            ref={headerRef}
             initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            style={{ textAlign: 'center' }}
+            animate={headerInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            style={{ textAlign: 'center', marginBottom: '5rem' }}
           >
-            <span style={{
-              display: 'inline-block',
-              padding: '0.5rem 1rem',
-              background: 'rgba(139, 92, 246, 0.1)',
-              border: '1px solid rgba(139, 92, 246, 0.2)',
-              borderRadius: '9999px',
-              fontSize: '0.875rem',
-              color: '#8b5cf6',
-              marginBottom: '1.5rem'
-            }}>
+            <span className="edu-eyebrow">
               <FaGraduationCap style={{ marginRight: '0.5rem', display: 'inline' }} />
               Academic Background
             </span>
-            <h1 style={{
-              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-              fontWeight: 700,
-              marginBottom: '1rem'
-            }}>
+            <h1 className="edu-heading">
               Education &{' '}
-              <span style={{
-                background: 'linear-gradient(90deg, #8b5cf6, #00d4ff)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>
-                Learning
-              </span>
+              <span className="edu-gradient-text">Learning</span>
             </h1>
-            <p style={{
-              fontSize: '1.125rem',
-              color: '#94a3b8',
-              maxWidth: '600px',
-              margin: '0 auto'
-            }}>
-              My academic journey and continuous learning through courses and certifications
+            <p className="edu-subtitle">
+              My academic journey — building a strong foundation for every challenge ahead.
             </p>
           </motion.div>
-        </section>
 
-        {/* Education Timeline */}
-        <section className="container" style={{ marginBottom: '6rem' }}>
-          <h2 style={{
-            fontSize: '1.5rem',
-            fontWeight: 600,
-            marginBottom: '2rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem'
-          }}>
-            <FaUniversity style={{ color: '#8b5cf6' }} />
-            Formal Education
-          </h2>
+          {/* ── Timeline ────────────────────────────────── */}
+          <div ref={ref}>
+            <div className="edu-timeline">
+              {/* CSS-powered animated line */}
+              <TimelineLine />
 
-          <div style={{ position: 'relative' }}>
-            {/* Timeline Line */}
-            <div style={{
-              position: 'absolute',
-              left: '24px',
-              top: 0,
-              bottom: 0,
-              width: '2px',
-              background: 'linear-gradient(180deg, #8b5cf6, #00d4ff)'
-            }} />
-
-            {education.map((edu, index) => (
               <motion.div
-                key={edu.id}
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.2 }}
-                style={{
-                  position: 'relative',
-                  paddingLeft: '80px',
-                  paddingBottom: '2rem'
-                }}
+                variants={containerVariants}
+                initial="hidden"
+                animate={inView ? 'visible' : 'hidden'}
               >
-                {/* Timeline Dot */}
-                <div style={{
-                  position: 'absolute',
-                  left: '10px',
-                  top: '4px',
-                  width: '30px',
-                  height: '30px',
-                  borderRadius: '50%',
-                  background: '#8b5cf6',
-                  border: '4px solid #0a0e1a',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#fff',
-                  fontSize: '0.75rem'
-                }}>
-                  {edu.icon}
-                </div>
-
-                {/* Content Card */}
-                <div style={{
-                  padding: '2rem',
-                  background: 'linear-gradient(145deg, rgba(20, 29, 51, 0.6) 0%, rgba(10, 14, 26, 0.8) 100%)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  borderRadius: '1rem'
-                }}>
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    marginBottom: '1rem',
-                    flexWrap: 'wrap',
-                    gap: '0.5rem'
-                  }}>
-                    <div>
-                      <h3 style={{
-                        fontSize: '1.25rem',
-                        fontWeight: 600,
-                        marginBottom: '0.5rem'
-                      }}>
-                        {edu.degree}
-                      </h3>
-                      <p style={{ color: '#8b5cf6', fontWeight: 500 }}>
-                        {edu.institution}, {edu.location}
-                      </p>
-                    </div>
-                    <span style={{
-                      padding: '0.375rem 0.875rem',
-                      background: 'rgba(139, 92, 246, 0.1)',
-                      border: '1px solid rgba(139, 92, 246, 0.2)',
-                      borderRadius: '9999px',
-                      fontSize: '0.75rem',
-                      color: '#8b5cf6',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.375rem'
-                    }}>
-                      <FaCalendarAlt />
-                      {edu.startDate} - {edu.endDate}
-                    </span>
-                  </div>
-
-                  <div>
-                    <h4 style={{
-                      fontSize: '0.875rem',
-                      fontWeight: 600,
-                      color: '#64748b',
-                      marginBottom: '0.75rem'
-                    }}>
-                      Highlights
-                    </h4>
-                    <ul style={{
-                      listStyle: 'none',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '0.5rem'
-                    }}>
-                      {edu.highlights.map((highlight, i) => (
-                        <li 
-                          key={i}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            fontSize: '0.875rem',
-                            color: '#94a3b8'
-                          }}
-                        >
-                          <span style={{ color: '#10b981' }}>✓</span>
-                          {highlight}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+                {education.map((edu) => (
+                  <TimelineCard key={edu.id} edu={edu} />
+                ))}
               </motion.div>
-            ))}
+            </div>
           </div>
-        </section>
+
+        </div>
       </main>
     </>
   );
