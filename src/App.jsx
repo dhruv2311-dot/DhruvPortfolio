@@ -132,7 +132,7 @@ function App() {
           {/* Snowfall Effect */}
           <Snowfall
             color="#00d4ff"
-            snowflakeCount={80}
+            snowflakeCount={200}
             style={{
               position: 'fixed',
               top: 0,
@@ -142,9 +142,9 @@ function App() {
               zIndex: 1,
               pointerEvents: 'none'
             }}
-            radius={[0.5, 2]}
-            speed={[0.5, 1.5]}
-            wind={[-0.5, 0.5]}
+            radius={[0.5, 3]}
+            speed={[1.5, 4]}
+            wind={[-0.5, 1]}
           />
           
           {/* Navigation */}
