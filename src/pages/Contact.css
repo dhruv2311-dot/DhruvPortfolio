@@ -1,181 +1,448 @@
-.contact {
+/* ============================================================
+   CONTACT PAGE — Premium CSS
+   ============================================================ */
+
+.ct-page {
   min-height: 100vh;
-  padding: calc(80px + var(--spacing-2xl)) var(--spacing-lg) var(--spacing-2xl);
 }
 
-.contact-container {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-/* Contact Content */
-.contact-content {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: var(--spacing-2xl);
-  margin-top: var(--spacing-2xl);
-}
-
-/* Contact Form */
-.contact-form-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.contact-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.form-input.error,
-.form-textarea.error {
-  border-color: var(--color-accent-error);
-}
-
-.submit-btn {
-  width: 100%;
-  margin-top: var(--spacing-md);
-}
-
-.submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.form-success {
-  padding: var(--spacing-md);
+/* ── Header ──────────────────────────────────────────────────── */
+.ct-eyebrow {
+  display: inline-block;
+  padding: 0.45rem 1.1rem;
   background: rgba(16, 185, 129, 0.1);
-  border: 1px solid var(--color-accent-success);
-  border-radius: var(--radius-md);
-  color: var(--color-accent-success);
-  text-align: center;
-  font-weight: 500;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: #10b981;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
 }
 
-.form-error-message {
-  padding: var(--spacing-md);
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid var(--color-accent-error);
-  border-radius: var(--radius-md);
-  color: var(--color-accent-error);
-  text-align: center;
-  font-weight: 500;
+.ct-heading {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  color: #f1f5f9;
+  margin-bottom: 1rem;
+  line-height: 1.1;
 }
 
-/* Contact Info */
-.contact-info-container {
+.ct-gradient-text {
+  background: linear-gradient(135deg, #00d4ff 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ct-subtitle {
+  font-size: 1.1rem;
+  color: #64748b;
+  max-width: 560px;
+  margin: 0 auto;
+  line-height: 1.75;
+}
+
+/* ── Two Column Grid ─────────────────────────────────────────── */
+.ct-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.55fr;
+  gap: 4rem;
+  align-items: start;
+  margin-bottom: 5rem;
+}
+
+/* ── Left Column ─────────────────────────────────────────────── */
+.ct-left {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: 0;
 }
 
-.contact-info-cards {
+.ct-left-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 0.75rem;
+}
+
+.ct-left-desc {
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.75;
+  margin-bottom: 2rem;
+}
+
+/* Info cards */
+.ct-info-list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 0.875rem;
+  margin-bottom: 0;
 }
 
-.contact-info-card {
-  padding: var(--spacing-lg);
-  text-align: center;
-  transition: all var(--transition-normal);
-}
-
-.contact-info-card:hover {
-  box-shadow: var(--glow-primary);
-}
-
-.contact-info-icon {
-  font-size: 2.5rem;
-  color: var(--color-accent-primary);
-  margin-bottom: var(--spacing-md);
-}
-
-.contact-info-card h3 {
-  font-size: 1.125rem;
-  color: var(--color-text-primary);
-  margin-bottom: var(--spacing-xs);
-  font-family: var(--font-heading);
-}
-
-.contact-info-value {
-  color: var(--color-text-secondary);
-  font-size: 1rem;
-  text-decoration: none;
-  transition: color var(--transition-fast);
-}
-
-a.contact-info-value:hover {
-  color: var(--color-accent-primary);
-}
-
-/* Availability Badge */
-.availability-badge {
-  padding: var(--spacing-lg);
+.ct-info-card {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  background: rgba(16, 185, 129, 0.05);
-  border-color: var(--color-accent-success);
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  background: linear-gradient(145deg, rgba(20,29,51,0.55), rgba(10,14,26,0.85));
+  border-radius: 1rem;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
 }
 
-.availability-indicator {
-  width: 12px;
-  height: 12px;
-  background: var(--color-accent-success);
-  border-radius: 50%;
+.ct-info-icon {
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 1.15rem;
   flex-shrink: 0;
 }
 
-.availability-badge h4 {
-  font-size: 1.125rem;
-  color: var(--color-accent-success);
-  margin: 0 0 var(--spacing-xs);
-  font-family: var(--font-heading);
+.ct-info-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #475569;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
 }
 
-.availability-badge p {
-  color: var(--color-text-secondary);
-  font-size: 0.9375rem;
+.ct-info-value {
+  font-size: 0.92rem;
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+/* Divider */
+.ct-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+  margin: 1.75rem 0;
+}
+
+/* Social */
+.ct-social-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #475569;
+  font-weight: 600;
+  margin-bottom: 0.875rem;
+}
+
+.ct-social-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.ct-social-link {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.ct-social-link:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+/* Availability */
+.ct-avail {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-top: 1.75rem;
+  padding: 1.1rem 1.25rem;
+  background: rgba(16, 185, 129, 0.07);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.55;
+}
+
+.ct-avail strong {
+  color: #e2e8f0;
+  font-weight: 700;
+}
+
+.ct-avail-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10b981;
+  flex-shrink: 0;
+  margin-top: 4px;
+  animation: avail-blink 2s ease-in-out infinite;
+  box-shadow: 0 0 6px #10b981;
+}
+
+@keyframes avail-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Right: Form ─────────────────────────────────────────────── */
+.ct-form-wrap {
+  padding: 2.75rem;
+  background: linear-gradient(145deg, rgba(20,29,51,0.55) 0%, rgba(10,14,26,0.88) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1.5rem;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.ct-fields-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.ct-field {
+  margin-bottom: 1.5rem;
+}
+
+/* Override for row wrapper */
+.ct-fields-row.ct-field {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.ct-field-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.ct-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  transition: color 0.25s ease;
+  letter-spacing: 0.02em;
+}
+
+.ct-input {
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  background: rgba(10, 14, 26, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  color: #f1f5f9;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.ct-input::placeholder {
+  color: #334155;
+}
+
+.ct-input:focus {
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+}
+
+.ct-textarea {
+  resize: vertical;
+  min-height: 144px;
+}
+
+/* Submit button */
+.ct-submit {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #00d4ff, #8b5cf6);
+  border: none;
+  border-radius: 0.875rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+  transition: box-shadow 0.3s ease;
+  letter-spacing: 0.02em;
+}
+
+.ct-submit:hover:not(:disabled) {
+  box-shadow: 0 8px 32px rgba(0, 212, 255, 0.35);
+}
+
+.ct-submit:disabled {
+  cursor: not-allowed;
+}
+
+.ct-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+}
+
+/* Status messages */
+.ct-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.ct-status-success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+
+.ct-status-error {
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  color: #f43f5e;
+}
+
+/* ── Footer Banner ───────────────────────────────────────────── */
+.ct-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 2rem 2.5rem;
+  background: linear-gradient(90deg, rgba(0,212,255,0.07), rgba(139,92,246,0.08));
+  border: 1px solid rgba(0, 212, 255, 0.18);
+  border-radius: 1.5rem;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.ct-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at left, rgba(0,212,255,0.06), transparent 55%),
+    radial-gradient(ellipse at right, rgba(139,92,246,0.06), transparent 55%);
+  pointer-events: none;
+}
+
+.ct-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ct-banner-dot-wrap {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.ct-banner-dot-inner {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.ct-banner-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #10b981;
+  opacity: 0.35;
+  animation: bannerPulse 2s ease-in-out infinite;
+}
+
+@keyframes bannerPulse {
+  0%, 100% { transform: scale(1); opacity: 0.35; }
+  50%       { transform: scale(1.7); opacity: 0; }
+}
+
+.ct-banner-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 0.2rem;
+}
+
+.ct-banner-sub {
+  font-size: 0.85rem;
+  color: #64748b;
   margin: 0;
 }
 
-/* Responsive */
+.ct-banner-btn {
+  padding: 0.8rem 2rem;
+  background: linear-gradient(135deg, #00d4ff, #8b5cf6);
+  border-radius: 0.75rem;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0,212,255,0.2);
+}
+
+.ct-banner-btn:hover {
+  box-shadow: 0 8px 28px rgba(0,212,255,0.35);
+  transform: translateY(-2px);
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 1024px) {
-  .contact-content {
+  .ct-grid {
     grid-template-columns: 1fr;
-    gap: var(--spacing-xl);
-  }
-
-  .contact-info-cards {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-md);
-  }
-
-  .availability-badge {
-    grid-column: 1 / -1;
+    gap: 3rem;
   }
 }
 
-@media (max-width: 768px) {
-  .contact {
-    padding: calc(70px + var(--spacing-xl)) var(--spacing-md) var(--spacing-xl);
+@media (max-width: 640px) {
+  .ct-form-wrap {
+    padding: 1.75rem 1.25rem;
   }
 
-  .contact-info-cards {
+  .ct-fields-row.ct-field {
     grid-template-columns: 1fr;
   }
-}
 
-@media (max-width: 480px) {
-  .contact-info-icon {
-    font-size: 2rem;
-  }
-
-  .availability-badge {
+  .ct-banner {
     flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem;
+  }
+
+  .ct-banner-btn {
+    width: 100%;
     text-align: center;
   }
 }
