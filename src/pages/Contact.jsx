@@ -1,140 +1,139 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { gsap } from 'gsap';
 import { useSpring, animated, config } from '@react-spring/web';
-import { 
+import { useInView } from 'react-intersection-observer';
+import {
   FaEnvelope, FaPhone, FaMapMarkerAlt, FaGithub,
   FaLinkedin, FaTwitter, FaInstagram, FaPaperPlane,
   FaCheckCircle, FaExclamationCircle
 } from 'react-icons/fa';
 import './Contact.css';
 
-/**
- * Contact Page - Interactive Form with Particle Effects
- * Features: Magnetic inputs, particle animations, form validation
- */
-const Contact = () => {
-  const canvasRef = useRef(null);
-  const formRef = useRef(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
+// ── Framer Motion Variants ────────────────────────────────────
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } }
+};
+
+const itemVariants = {
+  hidden:  { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }
+};
+
+const fieldVariants = {
+  hidden:  { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+};
+
+const fieldContainerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } }
+};
+
+// ── Info Card ─────────────────────────────────────────────────
+const InfoCard = ({ info }) => {
+  const [hovered, setHovered] = useState(false);
+
+  const spring = useSpring({
+    transform: hovered ? 'translateX(6px)' : 'translateX(0px)',
+    boxShadow: hovered
+      ? `0 12px 32px ${info.color}20, 0 0 0 1px ${info.color}28`
+      : '0 2px 12px rgba(0,0,0,0.18)',
+    config: config.gentle
   });
+
+  return (
+    <animated.a
+      href={info.link}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="ct-info-card"
+      style={{
+        ...spring,
+        border: `1px solid ${hovered ? info.color + '35' : 'rgba(255,255,255,0.06)'}`,
+        textDecoration: 'none',
+        transition: 'border-color 0.3s ease'
+      }}
+    >
+      <div className="ct-info-icon" style={{ background: `${info.color}18`, color: info.color }}>
+        {info.icon}
+      </div>
+      <div>
+        <div className="ct-info-label">{info.label}</div>
+        <div className="ct-info-value">{info.value}</div>
+      </div>
+    </animated.a>
+  );
+};
+
+// ── Social Link ───────────────────────────────────────────────
+const SocialLink = ({ social }) => {
+  const [hovered, setHovered] = useState(false);
+
+  const spring = useSpring({
+    scale: hovered ? 1.15 : 1,
+    color: hovered ? social.color : '#4b6080',
+    config: config.wobbly
+  });
+
+  return (
+    <animated.a
+      href={social.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="ct-social-link"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        ...spring,
+        border: `1px solid ${hovered ? social.color + '55' : 'rgba(255,255,255,0.1)'}`,
+        transition: 'border-color 0.3s ease'
+      }}
+      title={social.label}
+    >
+      {social.icon}
+    </animated.a>
+  );
+};
+
+// ── Main Component ────────────────────────────────────────────
+const Contact = () => {
+  const [formData, setFormData]     = useState({ name: '', email: '', subject: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
   const [focusedField, setFocusedField] = useState(null);
 
+  const { ref: leftRef,   inView: leftInView   } = useInView({ threshold: 0.12, triggerOnce: true });
+  const { ref: rightRef,  inView: rightInView  } = useInView({ threshold: 0.12, triggerOnce: true });
+  const { ref: bannerRef, inView: bannerInView } = useInView({ threshold: 0.2,  triggerOnce: true });
+
   const contactInfo = [
-    {
-      icon: <FaEnvelope />,
-      label: 'Email',
-      value: 'dhruv.sonagra@example.com',
-      link: 'mailto:dhruv.sonagra@example.com',
-      color: '#00d4ff'
-    },
-    {
-      icon: <FaPhone />,
-      label: 'Phone',
-      value: '+91 98765 43210',
-      link: 'tel:+919876543210',
-      color: '#10b981'
-    },
-    {
-      icon: <FaMapMarkerAlt />,
-      label: 'Location',
-      value: 'Mumbai, India',
-      link: '#',
-      color: '#f43f5e'
-    }
+    { icon: <FaEnvelope />,     label: 'Email',    value: 'dhruv.sonagra.cg@gmail.com', link: 'mailto:dhruv.sonagra.cg@gmail.com', color: '#00d4ff' },
+    { icon: <FaPhone />,        label: 'Phone',    value: '+91 88492 77382',             link: 'tel:+918849277382',                  color: '#10b981' },
+    { icon: <FaMapMarkerAlt />, label: 'Location', value: 'Ahmedabad, India',            link: '#',                                 color: '#f43f5e' }
   ];
 
   const socialLinks = [
-    { icon: <FaGithub />, url: 'https://github.com', label: 'GitHub', color: '#333' },
-    { icon: <FaLinkedin />, url: 'https://linkedin.com', label: 'LinkedIn', color: '#0077b5' },
-    { icon: <FaTwitter />, url: 'https://twitter.com', label: 'Twitter', color: '#1da1f2' },
-    { icon: <FaInstagram />, url: 'https://instagram.com', label: 'Instagram', color: '#e4405f' }
+    { icon: <FaGithub />,    url: 'https://github.com/dhruv2311-dot',                       label: 'GitHub',    color: '#a78bfa' },
+    { icon: <FaLinkedin />,  url: 'https://www.linkedin.com/in/dhruv-sonagra-995144321/',   label: 'LinkedIn',  color: '#0ea5e9' },
+    { icon: <FaTwitter />,   url: 'https://x.com/dhruvvv_23_',                              label: 'Twitter',   color: '#38bdf8' },
+    { icon: <FaInstagram />, url: 'https://www.instagram.com/dhruvvv_23_/',                 label: 'Instagram', color: '#f472b6' }
   ];
-
-  // Particle animation for canvas
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    let animationId;
-    let particles = [];
-
-    const resize = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    // Create particles
-    for (let i = 0; i < 30; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 3 + 1,
-        color: ['#00d4ff', '#8b5cf6', '#f43f5e'][Math.floor(Math.random() * 3)]
-      });
-    }
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color + '40';
-        ctx.fill();
-      });
-
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animationId);
-    };
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus(null);
-
     try {
-      const response = await fetch("https://formspree.io/f/mldleroq", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
+      const res = await fetch('https://formspree.io/f/mldleroq', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(formData)
       });
-
-      if (response.ok) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', subject: '', message: '' });
-      } else {
-        setSubmitStatus('error');
-      }
-    } catch (error) {
+      setSubmitStatus(res.ok ? 'success' : 'error');
+      if (res.ok) setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -142,526 +141,248 @@ const Contact = () => {
     }
   };
 
-  const handleChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
+  const handleChange = (e) =>
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
-  // React Spring animations for form interactions
-  const submitButtonSpring = useSpring({
-    scale: isSubmitting ? 0.95 : 1,
-    opacity: isSubmitting ? 0.7 : 1,
+  // React Spring for submit button
+  const btnSpring = useSpring({
+    scale:   isSubmitting ? 0.96 : 1,
+    opacity: isSubmitting ? 0.75 : 1,
     config: config.wobbly
   });
 
+  // React Spring for status messages
   const successSpring = useSpring({
-    opacity: submitStatus === 'success' ? 1 : 0,
-    transform: submitStatus === 'success' ? 'translateY(0px)' : 'translateY(-20px)',
+    opacity:   submitStatus === 'success' ? 1 : 0,
+    transform: submitStatus === 'success' ? 'translateY(0)' : 'translateY(-16px)',
     config: config.gentle
   });
-
   const errorSpring = useSpring({
-    opacity: submitStatus === 'error' ? 1 : 0,
-    transform: submitStatus === 'error' ? 'translateY(0px)' : 'translateY(-20px)',
-    config: { ...config.wobbly, tension: 300 }
+    opacity:   submitStatus === 'error' ? 1 : 0,
+    transform: submitStatus === 'error' ? 'translateY(0)' : 'translateY(-16px)',
+    config: config.wobbly
   });
 
   return (
     <>
       <Helmet>
         <title>Contact | Dhruv Sonagra</title>
-        <meta name="description" content="Get in touch for collaborations, opportunities, or just to say hello." />
+        <meta name="description" content="Get in touch with Dhruv Sonagra for collaborations or opportunities." />
       </Helmet>
 
-      <main className="contact" style={{ paddingTop: '120px' }}>
-        {/* Header */}
-        <section className="container" style={{ marginBottom: '4rem' }}>
+      <main className="ct-page" style={{ paddingTop: '120px', minHeight: '100vh' }}>
+        <div className="container">
+
+          {/* ── Header ──────────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            style={{ textAlign: 'center' }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            style={{ textAlign: 'center', marginBottom: '5rem' }}
           >
-            <span style={{
-              display: 'inline-block',
-              padding: '0.5rem 1rem',
-              background: 'rgba(16, 185, 129, 0.1)',
-              border: '1px solid rgba(16, 185, 129, 0.2)',
-              borderRadius: '9999px',
-              fontSize: '0.875rem',
-              color: '#10b981',
-              marginBottom: '1.5rem'
-            }}>
-              Get In Touch
-            </span>
-            <h1 style={{
-              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-              fontWeight: 700,
-              marginBottom: '1rem'
-            }}>
-              Let's{' '}
-              <span style={{
-                background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>
-                Connect
-              </span>
+            <span className="ct-eyebrow">Get In Touch</span>
+            <h1 className="ct-heading">
+              Let's <span className="ct-gradient-text">Connect</span>
             </h1>
-            <p style={{
-              fontSize: '1.125rem',
-              color: '#94a3b8',
-              maxWidth: '600px',
-              margin: '0 auto'
-            }}>
-              Have a project in mind or want to collaborate? I'd love to hear from you.
+            <p className="ct-subtitle">
+              Have a project in mind, a collaboration idea, or just want to say hi?
+              My inbox is always open.
             </p>
           </motion.div>
-        </section>
 
-        {/* Contact Grid */}
-        <section className="container" style={{ marginBottom: '6rem' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1.5fr',
-            gap: '4rem'
-          }}>
-            {/* Contact Info */}
-            <div>
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                <h2 style={{
-                  fontSize: '1.5rem',
-                  fontWeight: 600,
-                  marginBottom: '1.5rem'
-                }}>
-                  Contact Information
-                </h2>
-                <p style={{
-                  color: '#64748b',
-                  marginBottom: '2rem',
-                  lineHeight: 1.7
-                }}>
-                  Feel free to reach out through any of these channels. 
-                  I'm always open to discussing new projects and opportunities.
-                </p>
+          {/* ── Two Column Grid ──────────────────────────── */}
+          <div className="ct-grid">
 
-                {/* Contact Cards */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-                  {contactInfo.map((info, index) => (
-                    <motion.a
-                      key={info.label}
-                      href={info.link}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 + index * 0.1 }}
-                      className="magnetic"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '1rem',
-                        padding: '1.25rem',
-                        background: 'linear-gradient(145deg, rgba(20, 29, 51, 0.6) 0%, rgba(10, 14, 26, 0.8) 100%)',
-                        border: '1px solid rgba(255, 255, 255, 0.05)',
-                        borderRadius: '1rem',
-                        transition: 'all 0.3s ease'
-                      }}
-                    >
-                      <div style={{
-                        width: '48px',
-                        height: '48px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: `${info.color}15`,
-                        borderRadius: '12px',
-                        fontSize: '1.25rem',
-                        color: info.color
-                      }}>
-                        {info.icon}
-                      </div>
-                      <div>
-                        <div style={{
-                          fontSize: '0.75rem',
-                          color: '#64748b',
-                          textTransform: 'uppercase',
-                          letterSpacing: '1px',
-                          marginBottom: '0.25rem'
-                        }}>
-                          {info.label}
-                        </div>
-                        <div style={{ fontWeight: 500 }}>
-                          {info.value}
-                        </div>
-                      </div>
-                    </motion.a>
+            {/* ── Left: Info ──────────────────────────────── */}
+            <motion.div
+              ref={leftRef}
+              variants={containerVariants}
+              initial="hidden"
+              animate={leftInView ? 'visible' : 'hidden'}
+              className="ct-left"
+            >
+              <motion.h2 variants={itemVariants} className="ct-left-title">
+                Contact Information
+              </motion.h2>
+              <motion.p variants={itemVariants} className="ct-left-desc">
+                Feel free to reach out through any channel.
+                I'm always open to discussing new projects and opportunities.
+              </motion.p>
+
+              {/* Info cards */}
+              <motion.div variants={itemVariants} className="ct-info-list">
+                {contactInfo.map((info) => (
+                  <InfoCard key={info.label} info={info} />
+                ))}
+              </motion.div>
+
+              <div className="ct-divider" />
+
+              {/* Social */}
+              <motion.div variants={itemVariants}>
+                <p className="ct-social-label">Find me on</p>
+                <div className="ct-social-row">
+                  {socialLinks.map((s) => (
+                    <SocialLink key={s.label} social={s} />
                   ))}
                 </div>
-
-                {/* Social Links */}
-                <div>
-                  <h3 style={{
-                    fontSize: '1rem',
-                    fontWeight: 600,
-                    marginBottom: '1rem',
-                    color: '#64748b'
-                  }}>
-                    Follow Me
-                  </h3>
-                  <div style={{ display: 'flex', gap: '0.75rem' }}>
-                    {socialLinks.map((social, index) => (
-                      <motion.a
-                        key={social.label}
-                        href={social.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.5 + index * 0.1 }}
-                        className="magnetic"
-                        style={{
-                          width: '44px',
-                          height: '44px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          borderRadius: '50%',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          color: '#94a3b8',
-                          fontSize: '1.125rem',
-                          transition: 'all 0.3s ease'
-                        }}
-                        whileHover={{
-                          borderColor: social.color,
-                          color: social.color,
-                          scale: 1.1
-                        }}
-                      >
-                        {social.icon}
-                      </motion.a>
-                    ))}
-                  </div>
-                </div>
               </motion.div>
-            </div>
 
-            {/* Contact Form */}
+              {/* Availability */}
+              <motion.div variants={itemVariants} className="ct-avail">
+                <span className="ct-avail-dot" />
+                <span>
+                  <strong>Available for freelance work</strong>
+                  <br />
+                  <span>Currently accepting new projects</span>
+                </span>
+              </motion.div>
+            </motion.div>
+
+            {/* ── Right: Form ─────────────────────────────── */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              style={{
-                position: 'relative',
-                padding: '2.5rem',
-                background: 'linear-gradient(145deg, rgba(20, 29, 51, 0.6) 0%, rgba(10, 14, 26, 0.8) 100%)',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
-                borderRadius: '1.5rem',
-                overflow: 'hidden'
-              }}
+              ref={rightRef}
+              initial={{ opacity: 0, x: 36 }}
+              animate={rightInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="ct-form-wrap"
             >
-              {/* Particle Canvas */}
-              <canvas
-                ref={canvasRef}
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '100%',
-                  height: '100%',
-                  pointerEvents: 'none',
-                  opacity: 0.5
-                }}
-              />
-
-              <form ref={formRef} onSubmit={handleSubmit} style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                  {/* Name Field */}
-                  <div>
-                    <label style={{
-                      display: 'block',
-                      fontSize: '0.875rem',
-                      fontWeight: 500,
-                      marginBottom: '0.5rem',
-                      color: focusedField === 'name' ? '#00d4ff' : '#94a3b8',
-                      transition: 'color 0.3s ease'
-                    }}>
+              {/* Form fields — framer stagger (no animejs) */}
+              <motion.form
+                onSubmit={handleSubmit}
+                noValidate
+                variants={fieldContainerVariants}
+                initial="hidden"
+                animate={rightInView ? 'visible' : 'hidden'}
+              >
+                {/* Name + Email row */}
+                <motion.div variants={fieldVariants} className="ct-fields-row" style={{ marginBottom: '1.5rem' }}>
+                  <div className="ct-field-group">
+                    <label className="ct-label" style={{ color: focusedField === 'name' ? '#00d4ff' : '' }}>
                       Your Name
                     </label>
                     <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
+                      type="text" name="name" value={formData.name}
                       onChange={handleChange}
                       onFocus={() => setFocusedField('name')}
                       onBlur={() => setFocusedField(null)}
-                      required
-                      className="magnetic"
-                      style={{
-                        width: '100%',
-                        padding: '1rem 1.25rem',
-                        background: 'rgba(10, 14, 26, 0.5)',
-                        border: `1px solid ${focusedField === 'name' ? '#00d4ff' : 'rgba(255, 255, 255, 0.1)'}`,
-                        borderRadius: '0.75rem',
-                        color: '#fff',
-                        fontSize: '1rem',
-                        outline: 'none',
-                        transition: 'all 0.3s ease'
-                      }}
-                      placeholder="John Doe"
+                      required placeholder="John Doe" className="ct-input"
+                      style={{ borderColor: focusedField === 'name' ? 'rgba(0,212,255,0.5)' : '' }}
                     />
                   </div>
-
-                  {/* Email Field */}
-                  <div>
-                    <label style={{
-                      display: 'block',
-                      fontSize: '0.875rem',
-                      fontWeight: 500,
-                      marginBottom: '0.5rem',
-                      color: focusedField === 'email' ? '#00d4ff' : '#94a3b8',
-                      transition: 'color 0.3s ease'
-                    }}>
+                  <div className="ct-field-group">
+                    <label className="ct-label" style={{ color: focusedField === 'email' ? '#00d4ff' : '' }}>
                       Email Address
                     </label>
                     <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
+                      type="email" name="email" value={formData.email}
                       onChange={handleChange}
                       onFocus={() => setFocusedField('email')}
                       onBlur={() => setFocusedField(null)}
-                      required
-                      className="magnetic"
-                      style={{
-                        width: '100%',
-                        padding: '1rem 1.25rem',
-                        background: 'rgba(10, 14, 26, 0.5)',
-                        border: `1px solid ${focusedField === 'email' ? '#00d4ff' : 'rgba(255, 255, 255, 0.1)'}`,
-                        borderRadius: '0.75rem',
-                        color: '#fff',
-                        fontSize: '1rem',
-                        outline: 'none',
-                        transition: 'all 0.3s ease'
-                      }}
-                      placeholder="john@example.com"
+                      required placeholder="john@example.com" className="ct-input"
+                      style={{ borderColor: focusedField === 'email' ? 'rgba(0,212,255,0.5)' : '' }}
                     />
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Subject Field */}
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    marginBottom: '0.5rem',
-                    color: focusedField === 'subject' ? '#00d4ff' : '#94a3b8',
-                    transition: 'color 0.3s ease'
-                  }}>
+                {/* Subject */}
+                <motion.div variants={fieldVariants} style={{ marginBottom: '1.5rem' }}>
+                  <label className="ct-label" style={{ color: focusedField === 'subject' ? '#00d4ff' : '' }}>
                     Subject
                   </label>
                   <input
-                    type="text"
-                    name="subject"
-                    value={formData.subject}
+                    type="text" name="subject" value={formData.subject}
                     onChange={handleChange}
                     onFocus={() => setFocusedField('subject')}
                     onBlur={() => setFocusedField(null)}
-                    required
-                    className="magnetic"
-                    style={{
-                      width: '100%',
-                      padding: '1rem 1.25rem',
-                      background: 'rgba(10, 14, 26, 0.5)',
-                      border: `1px solid ${focusedField === 'subject' ? '#00d4ff' : 'rgba(255, 255, 255, 0.1)'}`,
-                      borderRadius: '0.75rem',
-                      color: '#fff',
-                      fontSize: '1rem',
-                      outline: 'none',
-                      transition: 'all 0.3s ease'
-                    }}
-                    placeholder="Project Collaboration"
+                    required placeholder="Project Collaboration" className="ct-input"
+                    style={{ borderColor: focusedField === 'subject' ? 'rgba(0,212,255,0.5)' : '' }}
                   />
-                </div>
+                </motion.div>
 
-                {/* Message Field */}
-                <div style={{ marginBottom: '2rem' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    marginBottom: '0.5rem',
-                    color: focusedField === 'message' ? '#00d4ff' : '#94a3b8',
-                    transition: 'color 0.3s ease'
-                  }}>
+                {/* Message */}
+                <motion.div variants={fieldVariants} style={{ marginBottom: '1.5rem' }}>
+                  <label className="ct-label" style={{ color: focusedField === 'message' ? '#00d4ff' : '' }}>
                     Message
                   </label>
                   <textarea
-                    name="message"
-                    value={formData.message}
+                    name="message" value={formData.message}
                     onChange={handleChange}
                     onFocus={() => setFocusedField('message')}
                     onBlur={() => setFocusedField(null)}
-                    required
-                    rows={5}
-                    className="magnetic"
-                    style={{
-                      width: '100%',
-                      padding: '1rem 1.25rem',
-                      background: 'rgba(10, 14, 26, 0.5)',
-                      border: `1px solid ${focusedField === 'message' ? '#00d4ff' : 'rgba(255, 255, 255, 0.1)'}`,
-                      borderRadius: '0.75rem',
-                      color: '#fff',
-                      fontSize: '1rem',
-                      outline: 'none',
-                      resize: 'vertical',
-                      minHeight: '150px',
-                      transition: 'all 0.3s ease',
-                      fontFamily: 'inherit'
-                    }}
-                    placeholder="Tell me about your project..."
+                    required rows={5} placeholder="Tell me about your project..."
+                    className="ct-input ct-textarea"
+                    style={{ borderColor: focusedField === 'message' ? 'rgba(0,212,255,0.5)' : '' }}
                   />
-                </div>
+                </motion.div>
 
-                {/* Submit Button with React Spring */}
-                <animated.button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="btn btn-primary magnetic"
-                  style={{
-                    ...submitButtonSpring,
-                    width: '100%',
-                    padding: '1rem 2rem',
-                    fontSize: '1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem',
-                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                    background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
-                    border: 'none',
-                    borderRadius: '0.75rem',
-                    color: '#fff',
-                    fontWeight: 600,
-                    transition: 'box-shadow 0.3s ease'
-                  }}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                        style={{
-                          width: '20px',
-                          height: '20px',
-                          border: '2px solid transparent',
-                          borderTopColor: '#fff',
-                          borderRadius: '50%'
-                        }}
-                      />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <FaPaperPlane />
-                      Send Message
-                    </>
-                  )}
-                </animated.button>
+                {/* Submit Button */}
+                <motion.div variants={fieldVariants}>
+                  <animated.button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="ct-submit"
+                    style={btnSpring}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
+                          className="ct-spinner"
+                        />
+                        Sending…
+                      </>
+                    ) : (
+                      <>
+                        <FaPaperPlane />
+                        Send Message
+                      </>
+                    )}
+                  </animated.button>
+                </motion.div>
 
-                {/* Status Messages with React Spring */}
+                {/* Status messages */}
                 {submitStatus === 'success' && (
-                  <animated.div
-                    style={{
-                      ...successSpring,
-                      marginTop: '1rem',
-                      padding: '1rem',
-                      background: 'rgba(16, 185, 129, 0.1)',
-                      border: '1px solid rgba(16, 185, 129, 0.3)',
-                      borderRadius: '0.75rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.75rem',
-                      color: '#10b981'
-                    }}
-                  >
-                    <FaCheckCircle size={20} />
-                    <span style={{ fontWeight: 500 }}>
-                      Message sent successfully! I'll get back to you soon.
-                    </span>
+                  <animated.div className="ct-status ct-status-success" style={successSpring}>
+                    <FaCheckCircle />
+                    Message sent! I'll get back to you shortly.
                   </animated.div>
                 )}
-                
                 {submitStatus === 'error' && (
-                  <animated.div
-                    style={{
-                      ...errorSpring,
-                      marginTop: '1rem',
-                      padding: '1rem',
-                      background: 'rgba(244, 63, 94, 0.1)',
-                      border: '1px solid rgba(244, 63, 94, 0.3)',
-                      borderRadius: '0.75rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.75rem',
-                      color: '#f43f5e'
-                    }}
-                  >
-                    <FaExclamationCircle size={20} />
-                    <span style={{ fontWeight: 500 }}>
-                      Something went wrong. Please try again.
-                    </span>
+                  <animated.div className="ct-status ct-status-error" style={errorSpring}>
+                    <FaExclamationCircle />
+                    Something went wrong. Please try again.
                   </animated.div>
                 )}
-              </form>
+              </motion.form>
             </motion.div>
           </div>
-        </section>
 
-        {/* Availability Banner */}
-        <section className="container" style={{ paddingBottom: '6rem' }}>
+          {/* ── Footer Banner ────────────────────────────── */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            style={{
-              padding: '2rem',
-              background: 'linear-gradient(90deg, rgba(0, 212, 255, 0.1), rgba(139, 92, 246, 0.1))',
-              border: '1px solid rgba(0, 212, 255, 0.2)',
-              borderRadius: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '1rem'
-            }}
+            ref={bannerRef}
+            initial={{ opacity: 0, y: 28 }}
+            animate={bannerInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+            className="ct-banner"
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{
-                width: '12px',
-                height: '12px',
-                background: '#10b981',
-                borderRadius: '50%',
-                animation: 'pulse 2s infinite'
-              }} />
+            <div className="ct-banner-left">
+              <div className="ct-banner-dot-wrap">
+                <span className="ct-banner-pulse" />
+                <span className="ct-banner-dot-inner" />
+              </div>
               <div>
-                <h3 style={{ fontWeight: 600, marginBottom: '0.25rem' }}>
-                  Available for freelance work
-                </h3>
-                <p style={{ fontSize: '0.875rem', color: '#64748b' }}>
-                  Currently accepting new projects for Q1 2025
-                </p>
+                <h3 className="ct-banner-title">Available for freelance work</h3>
+                <p className="ct-banner-sub">Let's build something great together.</p>
               </div>
             </div>
-            <a href="mailto:dhruv.sonagra@example.com" className="btn btn-primary">
+            <a href="mailto:dhruv.sonagra.cg@gmail.com" className="ct-banner-btn">
               Schedule a Call
             </a>
           </motion.div>
-        </section>
+
+        </div>
       </main>
     </>
   );
