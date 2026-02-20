@@ -1,296 +1,297 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { 
+import { useSpring, animated, config } from '@react-spring/web';
+import { useInView } from 'react-intersection-observer';
+import {
   FaDownload,
   FaGithub,
   FaLinkedin,
   FaTwitter,
   FaInstagram,
   FaCode,
-  FaYoutube
+  FaYoutube,
+  FaArrowRight
 } from 'react-icons/fa';
 import './About.css';
 
-/**
- * About Page - Simple Profile with Social Links
- * Features: Profile picture, description, resume download, social cards
- */
-const About = () => {
-  const socialLinks = [
-    { 
-      icon: <FaGithub />, 
-      url: 'https://github.com/dhruv2311-dot', 
-      label: 'GitHub', 
-      color: '#333',
-      description: 'Check out my code'
-    },
-    { 
-      icon: <FaLinkedin />, 
-      url: 'https://www.linkedin.com/in/dhruv-sonagra-995144321/', 
-      label: 'LinkedIn', 
-      color: '#0077b5',
-      description: 'Connect professionally'
-    },
-    { 
-      icon: <FaTwitter />, 
-      url: 'https://x.com/dhruvvv_23_', 
-      label: 'Twitter', 
-      color: '#1da1f2',
-      description: 'Follow my thoughts'
-    },
+// ── Framer Motion Variants ────────────────────────────────────
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } }
+};
 
-    { 
-      icon: <FaInstagram />, 
-      url: 'https://www.instagram.com/dhruvvv_23_/', 
-      label: 'Instagram', 
-      color: '#e4405f',
-      description: 'See my life'
-    },
-    {
-      icon: <FaCode />,
-      url: 'https://leetcode.com/u/dhruvvv_23/', 
-      label: 'LeetCode',
-      color: '#ffa116',
-      description: 'Problem solving'
-    },
-    {
-      icon: <FaYoutube />,
-      url: 'https://www.youtube.com/@Itz_dhruvv', 
-      label: 'YouTube',
-      color: '#ff0000',
-      description: 'Tech tutorials'
-    }
+const itemVariants = {
+  hidden:  { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
+};
+
+const traitVariants = {
+  hidden:  { opacity: 0, y: 16, scale: 0.88 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } }
+};
+
+// ── Spring Social Card ────────────────────────────────────────
+const SocialCard = ({ social }) => {
+  const [hovered, setHovered] = useState(false);
+
+  const cardSpring = useSpring({
+    transform: hovered ? 'translateY(-10px) scale(1.03)' : 'translateY(0px) scale(1)',
+    boxShadow: hovered
+      ? `0 24px 48px ${social.color}28, 0 0 0 1px ${social.color}40`
+      : '0 2px 16px rgba(0,0,0,0.25)',
+    config: config.wobbly
+  });
+
+  const iconSpring = useSpring({
+    transform: hovered ? 'scale(1.25) rotate(8deg)' : 'scale(1) rotate(0deg)',
+    config: { tension: 320, friction: 10 }
+  });
+
+  return (
+    <animated.a
+      href={social.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="about-social-card"
+      style={{
+        ...cardSpring,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '2rem 1.5rem',
+        background: 'linear-gradient(145deg, rgba(20,29,51,0.7) 0%, rgba(10,14,26,0.9) 100%)',
+        borderRadius: '1.25rem',
+        textDecoration: 'none',
+        border: `1px solid ${hovered ? social.color + '35' : 'rgba(255,255,255,0.06)'}`,
+        backdropFilter: 'blur(12px)',
+        cursor: 'pointer',
+        transition: 'border-color 0.3s ease'
+      }}
+    >
+      <animated.div
+        style={{
+          ...iconSpring,
+          width: '62px',
+          height: '62px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: `${social.color}18`,
+          borderRadius: '50%',
+          fontSize: '1.8rem',
+          color: social.color,
+          marginBottom: '1rem'
+        }}
+      >
+        {social.icon}
+      </animated.div>
+      <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff', marginBottom: '0.3rem' }}>
+        {social.label}
+      </h3>
+      <p style={{ fontSize: '0.8rem', color: '#64748b', textAlign: 'center' }}>
+        {social.description}
+      </p>
+    </animated.a>
+  );
+};
+
+// ── Trait Badge ───────────────────────────────────────────────
+const TraitBadge = ({ text, color = '#00d4ff' }) => (
+  <span
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+      padding: '0.45rem 1rem',
+      background: `${color}12`,
+      border: `1px solid ${color}30`,
+      borderRadius: '999px',
+      fontSize: '0.85rem',
+      color: '#cbd5e1',
+      fontWeight: 500,
+      whiteSpace: 'nowrap'
+    }}
+  >
+    <span style={{ width: 6, height: 6, borderRadius: '50%', background: color, flexShrink: 0 }} />
+    {text}
+  </span>
+);
+
+// ── Main Component ────────────────────────────────────────────
+const About = () => {
+  const { ref: sectionRef, inView }       = useInView({ threshold: 0.12, triggerOnce: true });
+  const { ref: socialRef,  inView: socialInView } = useInView({ threshold: 0.08, triggerOnce: true });
+
+  const socialLinks = [
+    { icon: <FaGithub />,   url: 'https://github.com/dhruv2311-dot',                       label: 'GitHub',     color: '#a78bfa', description: 'Open source & projects' },
+    { icon: <FaLinkedin />, url: 'https://www.linkedin.com/in/dhruv-sonagra-995144321/',   label: 'LinkedIn',   color: '#0ea5e9', description: 'Professional network' },
+    { icon: <FaTwitter />,  url: 'https://x.com/dhruvvv_23_',                              label: 'Twitter / X',color: '#38bdf8', description: 'Thoughts & updates' },
+    { icon: <FaInstagram />,url: 'https://www.instagram.com/dhruvvv_23_/',                 label: 'Instagram',  color: '#f472b6', description: 'Behind the scenes' },
+    { icon: <FaCode />,     url: 'https://leetcode.com/u/dhruvvv_23/',                     label: 'LeetCode',   color: '#fbbf24', description: 'DSA problem solving' },
+    { icon: <FaYoutube />,  url: 'https://www.youtube.com/@Itz_dhruvv',                    label: 'YouTube',    color: '#f87171', description: 'Tech tutorials' }
+  ];
+
+  const traits = [
+    { text: 'Full-Stack Development',    color: '#00d4ff' },
+    { text: 'Scalable Web Apps',         color: '#8b5cf6' },
+    { text: 'Intuitive UI/UX',           color: '#10b981' },
+    { text: 'Performance Optimization',  color: '#f59e0b' },
+    { text: 'Open Source Contribution',  color: '#f43f5e' },
+    { text: 'Continuous Learning',       color: '#6366f1' }
   ];
 
   return (
     <>
       <Helmet>
         <title>About | Dhruv Sonagra</title>
-        <meta name="description" content="Learn about my journey as a Full-Stack Developer and connect with me." />
+        <meta name="description" content="Dhruv Sonagra — Full-Stack Developer passionate about building scalable, elegant web experiences." />
       </Helmet>
 
       <main className="about" style={{ paddingTop: '120px', minHeight: '100vh' }}>
         <div className="container">
-          {/* Profile Section */}
-          <section style={{ marginBottom: '4rem' }}>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 2fr',
-              gap: '4rem',
-              alignItems: 'center'
-            }}>
-              {/* Profile Picture */}
+
+          {/* ── Profile Row ───────────────────────────────── */}
+          <section ref={sectionRef} style={{ marginBottom: '6rem' }}>
+            <div className="about-profile-grid">
+
+              {/* Photo Column */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6 }}
-                style={{
-                  position: 'relative'
-                }}
+                className="about-photo-col"
+                initial={{ opacity: 0, x: -40 }}
+                animate={inView ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
               >
-                <div style={{
-                  width: '300px',
-                  height: '300px',
-                  borderRadius: '50%',
-                  overflow: 'hidden',
-                  border: '3px solid rgba(0, 212, 255, 0.3)',
-                  boxShadow: '0 0 60px rgba(0, 212, 255, 0.2)'
-                }}>
+                <div className="about-photo-glow" />
+                <div className="about-orbit about-orbit-1" />
+                <div className="about-orbit about-orbit-2" />
+                <div className="about-photo-frame">
                   <img
                     src="https://res.cloudinary.com/dtkzxbcjx/image/upload/v1770642896/IMG_1208_uxkdnq.png"
                     alt="Dhruv Sonagra"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      objectPosition: 'center 25%'
-                    }}
+                    className="about-photo-img"
                   />
                 </div>
-                {/* Decorative ring */}
-                <div style={{
-                  position: 'absolute',
-                  inset: '-10px',
-                  border: '2px solid rgba(139, 92, 246, 0.2)',
-                  borderRadius: '50%',
-                  animation: 'spin 20s linear infinite'
-                }} />
+                <motion.div
+                  className="about-status-badge"
+                  animate={{ y: [0, -6, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <span className="about-status-dot" />
+                  Open to Opportunities
+                </motion.div>
               </motion.div>
 
-              {/* Description */}
+              {/* Text Column — framer stagger */}
               <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
+                className="about-text-col"
+                variants={containerVariants}
+                initial="hidden"
+                animate={inView ? 'visible' : 'hidden'}
               >
-                <span style={{
-                  display: 'inline-block',
-                  padding: '0.5rem 1rem',
-                  background: 'rgba(0, 212, 255, 0.1)',
-                  border: '1px solid rgba(0, 212, 255, 0.2)',
-                  borderRadius: '9999px',
-                  fontSize: '0.875rem',
-                  color: '#00d4ff',
-                  marginBottom: '1.5rem'
-                }}>
+                <motion.span variants={itemVariants} className="about-eyebrow">
                   About Me
-                </span>
+                </motion.span>
 
-                <h1 style={{
-                  fontSize: 'clamp(2rem, 4vw, 3rem)',
-                  fontWeight: 700,
-                  marginBottom: '1.5rem'
-                }}>
+                <motion.h1 variants={itemVariants} className="about-heading">
                   Hi, I'm{' '}
-                  <span style={{
-                    background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
-                  }}>
-                    Dhruv Sonagra
-                  </span>
-                </h1>
+                  <span className="about-name-gradient">Dhruv Sonagra</span>
+                </motion.h1>
 
-                <p style={{
-                  fontSize: '1.125rem',
-                  color: '#94a3b8',
-                  lineHeight: 1.8,
-                  marginBottom: '1.5rem'
-                }}>
-                  I'm a passionate Full-Stack Developer with a strong foundation in both frontend and backend technologies. My journey in web development started with a curiosity about how things work on the internet, and it has evolved into a professional pursuit of creating elegant, efficient, and user-friendly applications.
-                </p>
+                <motion.p variants={itemVariants} className="about-bio-text">
+                  I'm a passionate{' '}
+                  <strong style={{ color: '#e2e8f0' }}>Full-Stack Developer</strong> with a
+                  strong foundation in both frontend and backend technologies. My journey started
+                  with curiosity about how the internet works and has evolved into a professional
+                  pursuit of crafting{' '}
+                  <strong style={{ color: '#e2e8f0' }}>elegant, scalable, and user-centric</strong>{' '}
+                  applications.
+                </motion.p>
 
-                <p style={{
-                  fontSize: '1.125rem',
-                  color: '#94a3b8',
-                  lineHeight: 1.8,
-                  marginBottom: '1.5rem'
-                }}>
-                  My technical interests include:
-                </p>
+                <motion.p variants={itemVariants} className="about-bio-sub">
+                  When I'm not building things, I'm exploring new tech, solving problems on
+                  LeetCode, or contributing to open-source. I believe clean code and great design
+                  go hand in hand.
+                </motion.p>
 
-                <ul style={{
-                  listStyle: 'disc',
-                  paddingLeft: '1.5rem',
-                  marginBottom: '1.5rem',
-                  color: '#94a3b8',
-                  fontSize: '1.125rem',
-                  lineHeight: 1.8
-                }}>
-                  <li style={{ marginBottom: '0.5rem' }}>Building scalable web applications</li>
-                  <li style={{ marginBottom: '0.5rem' }}>Creating intuitive user interfaces</li>
-                  <li style={{ marginBottom: '0.5rem' }}>Optimizing application performance</li>
-                  <li style={{ marginBottom: '0.5rem' }}>Learning new technologies and frameworks</li>
-                </ul>
-
-                <p style={{
-                  fontSize: '1rem',
-                  color: '#64748b',
-                  lineHeight: 1.7,
-                  marginBottom: '2rem'
-                }}>
-                  When I'm not coding, you can find me exploring new technologies, contributing to open-source projects, or sharing my knowledge through technical blog posts.
-                </p>
-
-                {/* Download Resume Button */}
-                <motion.a
-                  href="https://drive.google.com/file/d/1FjF18VC8QK7bAad8wifswbDqiojUBKXe/view?usp=sharing"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary magnetic"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                {/* Trait badges — stagger via containerVariants child */}
+                <motion.div
+                  variants={containerVariants}
+                  style={{ display: 'flex', flexWrap: 'wrap', gap: '0.625rem', marginBottom: '2.5rem' }}
                 >
-                  <FaDownload />
-                  Download Resume
-                </motion.a>
+                  {traits.map((t, i) => (
+                    <motion.span key={i} variants={traitVariants}>
+                      <TraitBadge text={t.text} color={t.color} />
+                    </motion.span>
+                  ))}
+                </motion.div>
+
+                {/* CTA Buttons */}
+                <motion.div
+                  variants={itemVariants}
+                  style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}
+                >
+                  <motion.a
+                    href="https://drive.google.com/file/d/1FjF18VC8QK7bAad8wifswbDqiojUBKXe/view?usp=sharing"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="about-btn-primary"
+                    whileHover={{ scale: 1.04, boxShadow: '0 0 30px rgba(0,212,255,0.35)' }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <FaDownload />
+                    Download Resume
+                  </motion.a>
+                  <motion.a
+                    href="#connect"
+                    className="about-btn-ghost"
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    Let's Connect
+                    <FaArrowRight style={{ marginLeft: '0.4rem' }} />
+                  </motion.a>
+                </motion.div>
               </motion.div>
             </div>
           </section>
 
-          {/* Social Cards Section */}
-          <section style={{ paddingBottom: '6rem' }}>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              style={{
-                fontSize: '1.5rem',
-                fontWeight: 600,
-                textAlign: 'center',
-                marginBottom: '2rem'
-              }}
-            >
-              Let's Connect
-            </motion.h2>
+          {/* ── Divider ───────────────────────────────────── */}
+          <div className="about-section-divider" />
 
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '1.5rem'
-            }}>
-              {socialLinks.map((social, index) => (
-                <motion.a
-                  key={social.label}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ 
-                    y: -5,
-                    transition: { duration: 0.2 }
-                  }}
-                  style={{
-                    padding: '2rem',
-                    background: 'linear-gradient(145deg, rgba(20, 29, 51, 0.6) 0%, rgba(10, 14, 26, 0.8) 100%)',
-                    border: `1px solid ${social.color}30`,
-                    borderRadius: '1rem',
-                    textAlign: 'center',
-                    transition: 'all 0.3s ease',
-                    cursor: 'pointer',
-                    textDecoration: 'none'
-                  }}
-                >
-                  <div style={{
-                    width: '60px',
-                    height: '60px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: `${social.color}15`,
-                    borderRadius: '50%',
-                    fontSize: '1.75rem',
-                    color: social.color,
-                    margin: '0 auto 1rem'
-                  }}>
-                    {social.icon}
-                  </div>
-                  <h3 style={{
-                    fontSize: '1.125rem',
-                    fontWeight: 600,
-                    marginBottom: '0.5rem',
-                    color: '#fff'
-                  }}>
-                    {social.label}
-                  </h3>
-                  <p style={{
-                    fontSize: '0.875rem',
-                    color: '#64748b'
-                  }}>
-                    {social.description}
-                  </p>
-                </motion.a>
+          {/* ── Social / Connect Section ──────────────────── */}
+          <section id="connect" ref={socialRef} style={{ paddingBottom: '7rem' }}>
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={socialInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6 }}
+              style={{ textAlign: 'center', marginBottom: '3rem' }}
+            >
+              <span className="about-eyebrow">Social</span>
+              <h2 className="about-section-heading">
+                Let's <span className="about-name-gradient">Connect</span>
+              </h2>
+              <p style={{ color: '#64748b', maxWidth: '520px', margin: '0 auto', lineHeight: 1.7 }}>
+                Whether it's a project, collaboration, or just a chat about tech — I'm always reachable.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="about-social-grid"
+              variants={containerVariants}
+              initial="hidden"
+              animate={socialInView ? 'visible' : 'hidden'}
+            >
+              {socialLinks.map((social) => (
+                <motion.div key={social.label} variants={itemVariants}>
+                  <SocialCard social={social} />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </section>
+
         </div>
       </main>
     </>
