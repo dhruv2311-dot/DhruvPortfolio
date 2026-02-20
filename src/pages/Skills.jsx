@@ -1,412 +1,230 @@
-import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { 
-  FaReact, FaNodeJs, FaPython, FaGitAlt, FaDocker, 
-  FaAws, FaFigma, FaDatabase, FaHtml5, FaJs, FaAngular, FaCode 
+import { useSpring, animated, config } from '@react-spring/web';
+import { useInView } from 'react-intersection-observer';
+import {
+  FaReact, FaNodeJs, FaPython, FaGitAlt, FaDocker,
+  FaAws, FaFigma, FaDatabase, FaHtml5, FaJs, FaAngular, FaCode
 } from 'react-icons/fa';
-import { 
+import {
   SiTypescript, SiNextdotjs, SiTailwindcss, SiMongodb,
   SiPostgresql, SiRedis, SiGraphql, SiJest, SiKubernetes,
-  SiExpress, SiPostman, SiCplusplus 
+  SiExpress, SiPostman, SiCplusplus
 } from 'react-icons/si';
 import './Skills.css';
 
-/**
- * Skills Page - Constellation Network Visualization
- * Features: Animated skill nodes, category filtering, orbital animation
- */
+// ── Motion Variants ───────────────────────────────────────────
+const gridVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06 } }
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.82, y: 24 },
+  visible: {
+    opacity: 1, scale: 1, y: 0,
+    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] }
+  },
+  exit: { opacity: 0, scale: 0.82, transition: { duration: 0.2 } }
+};
+
+// ── Skill Card with React Spring hover ───────────────────────
+const SkillCard = ({ skill }) => {
+  const [hovered, setHovered] = useState(false);
+
+  const cardSpring = useSpring({
+    transform: hovered ? 'translateY(-10px) scale(1.05)' : 'translateY(0px) scale(1)',
+    boxShadow: hovered
+      ? `0 20px 40px ${skill.color}22, 0 0 0 1px ${skill.color}35`
+      : '0 4px 16px rgba(0,0,0,0.18)',
+    config: { tension: 320, friction: 22 }
+  });
+
+  const iconSpring = useSpring({
+    transform: hovered ? 'scale(1.22) rotate(6deg)' : 'scale(1) rotate(0deg)',
+    filter: hovered
+      ? `drop-shadow(0 0 14px ${skill.color})`
+      : 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+    config: config.wobbly
+  });
+
+  return (
+    <animated.div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="sk-card"
+      style={{
+        ...cardSpring,
+        background: hovered
+          ? `linear-gradient(145deg, ${skill.color}12, rgba(10,14,26,0.95))`
+          : 'linear-gradient(145deg, rgba(20,29,51,0.55), rgba(10,14,26,0.85))',
+        border: `1px solid ${hovered ? skill.color + '40' : 'rgba(255,255,255,0.06)'}`,
+        transition: 'background 0.35s ease, border-color 0.35s ease'
+      }}
+    >
+      {/* Glow spot on hover */}
+      <div
+        className="sk-card-glow"
+        style={{ background: skill.color, opacity: hovered ? 0.18 : 0 }}
+      />
+
+      <animated.div className="sk-icon" style={{ ...iconSpring, color: skill.color }}>
+        {skill.icon}
+      </animated.div>
+
+      <span className="sk-name">{skill.name}</span>
+
+      {/* Category chip */}
+      <span
+        className="sk-chip"
+        style={{ color: skill.color, borderColor: `${skill.color}30`, background: `${skill.color}0d` }}
+      >
+        {skill.category}
+      </span>
+    </animated.div>
+  );
+};
+
+// ── Category Tab Button ───────────────────────────────────────
+const TabButton = ({ label, isActive, onClick }) => {
+  const [hovered, setHovered] = useState(false);
+
+  const btnSpring = useSpring({
+    scale: hovered && !isActive ? 1.07 : 1,
+    config: { tension: 400, friction: 18 }
+  });
+
+  return (
+    <animated.button
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={`sk-tab${isActive ? ' sk-tab-active' : ''}`}
+      style={{ ...btnSpring }}
+    >
+      {label}
+    </animated.button>
+  );
+};
+
+// ── Main Component ────────────────────────────────────────────
 const Skills = () => {
-  const canvasRef = useRef(null);
   const [activeCategory, setActiveCategory] = useState('All');
-  const [hoveredSkill, setHoveredSkill] = useState(null);
+  const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
 
   const categories = ['All', 'Frontend', 'Backend', 'Tools', 'Problem Solving'];
 
   const skills = [
-    // Frontend
-    { 
-      category: 'Frontend',
-      name: 'HTML/CSS',
-      icon: <FaHtml5 />,
-      color: '#e34c26'
-    },
-    { 
-      category: 'Frontend',
-      name: 'JavaScript',
-      icon: <FaJs />,
-      color: '#f0db4f'
-    },
-    { 
-      category: 'Frontend',
-      name: 'React',
-      icon: <FaReact />,
-      color: '#61dafb'
-    },
-    { 
-      category: 'Frontend',
-      name: 'TypeScript',
-      icon: <SiTypescript />,
-      color: '#007acc'
-    },
-    { 
-      category: 'Frontend',
-      name: 'Angular.js',
-      icon: <FaAngular />,
-      color: '#dd0031'
-    },
-    
-    // Backend
-    { 
-      category: 'Backend',
-      name: 'Node.js',
-      icon: <FaNodeJs />,
-      color: '#68a063'
-    },
-    { 
-      category: 'Backend',
-      name: 'Express',
-      icon: <SiExpress />,
-      color: '#828282'
-    },
-    { 
-      category: 'Backend',
-      name: 'MongoDB',
-      icon: <SiMongodb />,
-      color: '#4DB33D'
-    },
-    { 
-      category: 'Backend',
-      name: 'SQL',
-      icon: <FaDatabase />, // Using generic DB icon for SQL as specific SQL icon might vary or just standard DB
-      color: '#F29111'
-    },
-    { 
-      category: 'Backend',
-      name: 'Redis',
-      icon: <SiRedis />,
-      color: '#DC382D'
-    },
-    
-    // Tools
-    { 
-      category: 'Tools',
-      name: 'Git',
-      icon: <FaGitAlt />,
-      color: '#F05032'
-    },
-    { 
-      category: 'Tools',
-      name: 'Docker',
-      icon: <FaDocker />,
-      color: '#2496ED'
-    },
-    { 
-      category: 'Tools',
-      name: 'Figma',
-      icon: <FaFigma />,
-      color: '#F24E1E'
-    },
-    { 
-      category: 'Tools',
-      name: 'Postman',
-      icon: <SiPostman />,
-      color: '#FF9900'
-    },
-    // Problem Solving
-    { 
-      category: 'Problem Solving',
-      name: 'C++',
-      icon: <SiCplusplus />,
-      color: '#00599C'
-    },
-     { 
-      category: 'Problem Solving',
-      name: 'DSA',
-      icon: <FaCode />,
-      color: '#FF9900'
-    }
+    { category: 'Frontend', name: 'HTML / CSS', icon: <FaHtml5 />, color: '#e34c26' },
+    { category: 'Frontend', name: 'JavaScript', icon: <FaJs />, color: '#f0db4f' },
+    { category: 'Frontend', name: 'React', icon: <FaReact />, color: '#61dafb' },
+    { category: 'Frontend', name: 'TypeScript', icon: <SiTypescript />, color: '#3178c6' },
+    { category: 'Frontend', name: 'Angular', icon: <FaAngular />, color: '#dd0031' },
+    { category: 'Frontend', name: 'Tailwind CSS', icon: <SiTailwindcss />, color: '#38bdf8' },
+    { category: 'Backend', name: 'Node.js', icon: <FaNodeJs />, color: '#68a063' },
+    { category: 'Backend', name: 'Express', icon: <SiExpress />, color: '#a3a3a3' },
+    { category: 'Backend', name: 'MongoDB', icon: <SiMongodb />, color: '#4DB33D' },
+    { category: 'Backend', name: 'SQL', icon: <FaDatabase />, color: '#F29111' },
+    { category: 'Backend', name: 'Redis', icon: <SiRedis />, color: '#DC382D' },
+    { category: 'Tools', name: 'Git', icon: <FaGitAlt />, color: '#F05032' },
+    { category: 'Tools', name: 'Docker', icon: <FaDocker />, color: '#2496ED' },
+    { category: 'Tools', name: 'Figma', icon: <FaFigma />, color: '#F24E1E' },
+    { category: 'Tools', name: 'Postman', icon: <SiPostman />, color: '#FF6C37' },
+    { category: 'Problem Solving', name: 'C++', icon: <SiCplusplus />, color: '#00599C' },
+    { category: 'Problem Solving', name: 'DSA', icon: <FaCode />, color: '#fbbf24' }
   ];
 
-  const filteredSkills = activeCategory === 'All' 
-    ? skills 
+  const filtered = activeCategory === 'All'
+    ? skills
     : skills.filter(s => s.category === activeCategory);
-
-  // Canvas constellation effect
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    let animationId;
-    let particles = [];
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    // Create particles
-    for (let i = 0; i < 50; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 2 + 1
-      });
-    }
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Update and draw particles
-      particles.forEach((p, i) => {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        // Bounce off edges
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-        // Draw particle
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0, 212, 255, 0.5)';
-        ctx.fill();
-
-        // Draw connections
-        particles.forEach((p2, j) => {
-          if (i === j) return;
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 150) {
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(0, 212, 255, ${0.2 * (1 - dist / 150)})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        });
-      });
-
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animationId);
-    };
-  }, []);
 
   return (
     <>
       <Helmet>
         <title>Skills | Dhruv Sonagra</title>
-        <meta name="description" content="Explore my technical skills in frontend, backend, database, DevOps, and development tools." />
+        <meta name="description" content="Explore my technical skills in frontend, backend, databases and tools." />
       </Helmet>
 
-      <main className="skills" style={{ paddingTop: '120px', position: 'relative', minHeight: '100vh' }}>
-        {/* Background Canvas */}
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            pointerEvents: 'none',
-            zIndex: 0
-          }}
-        />
-
+      <main className="skills-page" style={{ paddingTop: '120px', minHeight: '100vh' }}>
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-          {/* Header */}
+
+          {/* ── Header ──────────────────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            style={{ textAlign: 'center', marginBottom: '3rem' }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            style={{ textAlign: 'center', marginBottom: '3.5rem' }}
           >
-            <span style={{
-              display: 'inline-block',
-              padding: '0.5rem 1rem',
-              background: 'rgba(139, 92, 246, 0.1)',
-              border: '1px solid rgba(139, 92, 246, 0.2)',
-              borderRadius: '9999px',
-              fontSize: '0.875rem',
-              color: '#8b5cf6',
-              marginBottom: '1.5rem'
-            }}>
-              My Expertise
-            </span>
-            <h1 style={{
-              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-              fontWeight: 700,
-              marginBottom: '1rem'
-            }}>
+            <span className="skills-eyebrow">Tech Stack</span>
+            <h1 className="skills-heading">
               Technical{' '}
-              <span style={{
-                background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>
-                Skills
-              </span>
+              <span className="skills-gradient-text">Skills</span>
             </h1>
-            <p style={{
-              fontSize: '1.125rem',
-              color: '#94a3b8',
-              maxWidth: '600px',
-              margin: '0 auto'
-            }}>
-              A comprehensive overview of my technical toolkit and proficiency levels
+            <p className="skills-subtitle">
+              Technologies I use to bring ideas to life — from UI to servers.
             </p>
           </motion.div>
 
-          {/* Category Filter */}
+          {/* ── Category Tabs ────────────────────────────────────── */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '0.75rem',
-              marginBottom: '3rem',
-              flexWrap: 'wrap'
-            }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="sk-tabs"
           >
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className="magnetic"
-                style={{
-                  padding: '0.625rem 1.25rem',
-                  background: activeCategory === category 
-                    ? 'linear-gradient(90deg, #00d4ff, #8b5cf6)' 
-                    : 'rgba(255, 255, 255, 0.05)',
-                  border: 'none',
-                  borderRadius: '9999px',
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  color: activeCategory === category ? '#fff' : '#94a3b8',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                {category}
-              </button>
+            {categories.map(cat => (
+              <TabButton
+                key={cat}
+                label={cat}
+                isActive={activeCategory === cat}
+                onClick={() => setActiveCategory(cat)}
+              />
             ))}
           </motion.div>
 
-          {/* Skills Grid */}
-          <motion.div
-            layout
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '1.5rem'
-            }}
-          >
-            {filteredSkills.map((skill, index) => (
+          {/* ── Skills Grid ──────────────────────────────────────── */}
+          <div ref={ref}>
+            <AnimatePresence mode="wait">
               <motion.div
-                key={skill.name}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                onMouseEnter={() => setHoveredSkill(skill.name)}
-                onMouseLeave={() => setHoveredSkill(null)}
-                style={{
-                  padding: '1.5rem',
-                  background: 'linear-gradient(145deg, rgba(20, 29, 51, 0.6) 0%, rgba(10, 14, 26, 0.8) 100%)',
-                  border: `1px solid ${hoveredSkill === skill.name ? skill.color : 'rgba(255, 255, 255, 0.05)'}`,
-                  borderRadius: '1rem',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer'
-                }}
+                key={activeCategory}
+                className="sk-grid"
+                variants={gridVariants}
+                initial="hidden"
+                animate={inView ? 'visible' : 'hidden'}
+                exit="hidden"
               >
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1rem'
-                }}>
-                  <div style={{
-                    width: '50px',
-                    height: '50px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: `${skill.color}15`,
-                    borderRadius: '12px',
-                    fontSize: '1.5rem',
-                    color: skill.color
-                  }}>
-                    {skill.icon}
-                  </div>
-                  <div>
-                    <h3 style={{
-                      fontSize: '1.125rem',
-                      fontWeight: 600,
-                      marginBottom: '0.25rem'
-                    }}>
-                      {skill.name}
-                    </h3>
-                    <span style={{
-                      fontSize: '0.75rem',
-                      color: '#64748b',
-                      textTransform: 'uppercase',
-                      letterSpacing: '1px'
-                    }}>
-                      {skill.category}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Progress Bar */}
-
+                {filtered.map((skill) => (
+                  <motion.div key={skill.name} variants={cardVariants} layout>
+                    <SkillCard skill={skill} />
+                  </motion.div>
+                ))}
               </motion.div>
-            ))}
-          </motion.div>
+            </AnimatePresence>
+          </div>
 
-          {/* Skill Summary */}
+          {/* ── Always Learning Banner ───────────────────────────── */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            style={{
-              marginTop: '4rem',
-              padding: '2rem',
-              background: 'linear-gradient(145deg, rgba(20, 29, 51, 0.4) 0%, rgba(10, 14, 26, 0.6) 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.05)',
-              borderRadius: '1rem',
-              textAlign: 'center'
-            }}
+            className="sk-banner"
           >
-            <h3 style={{
-              fontSize: '1.25rem',
-              fontWeight: 600,
-              marginBottom: '1rem'
-            }}>
-              Always Learning
-            </h3>
-            <p style={{ color: '#94a3b8', maxWidth: '600px', margin: '0 auto' }}>
-              Technology evolves rapidly, and I'm committed to continuous learning. 
-              Currently exploring AI/ML integration, Web3 technologies, and advanced system design patterns.
-            </p>
+            <div className="sk-banner-glow" />
+            <div>
+              <h3 className="sk-banner-title">Always Learning</h3>
+              <p className="sk-banner-desc">
+                Currently exploring <strong>AI/ML integration</strong>, <strong>Web3 technologies</strong>,
+                and advanced system design patterns.
+              </p>
+            </div>
+            <div className="sk-banner-badge">
+              <span className="sk-banner-dot" />
+              Growing daily
+            </div>
           </motion.div>
+
         </div>
       </main>
     </>
