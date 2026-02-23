@@ -247,7 +247,7 @@ const Contact = () => {
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="ct-form-wrap"
             >
-              {/* Form fields — framer stagger (no animejs) */}
+              {/* Form fields — framer-motion stagger */}
               <motion.form
                 onSubmit={handleSubmit}
                 noValidate
