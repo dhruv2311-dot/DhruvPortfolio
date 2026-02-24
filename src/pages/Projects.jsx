@@ -1,15 +1,14 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow, Pagination, Navigation, Autoplay } from 'swiper/modules';
-import { 
+import {
   FaGithub, FaExternalLinkAlt, FaFigma, FaTimes,
-  FaReact, FaNodeJs, FaDatabase, FaAws
+  FaPlay, FaVolumeMute, FaVolumeUp
 } from 'react-icons/fa';
-import { SiNextdotjs, SiTypescript, SiMongodb, SiTailwindcss } from 'react-icons/si';
 
 // Swiper styles
 import 'swiper/css';
@@ -20,6 +19,267 @@ import './Projects.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// ── Helper: build iframe src with correct mute param ──────────
+const buildVideoSrc = (url, muted) => {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    u.searchParams.set('autoplay', '1');
+    u.searchParams.set('mute', muted ? '1' : '0');
+    u.searchParams.set('controls', '1');
+    u.searchParams.set('modestbranding', '1');
+    u.searchParams.set('rel', '0');
+    return u.toString();
+  } catch {
+    // fallback: raw append
+    const sep = url.includes('?') ? '&' : '?';
+    return `${url}${sep}autoplay=1&mute=${muted ? 1 : 0}&controls=1`;
+  }
+};
+
+// ── VideoProjectCard ──────────────────────────────────────────
+const VideoProjectCard = ({ project, onSelect }) => {
+  const [hovered, setHovered]   = useState(false);
+  const [muted, setMuted]       = useState(true);
+  const [showVideo, setShowVideo] = useState(false);
+  const hoverTimerRef           = useRef(null);
+  const hasVideo                = Boolean(project.videoUrl);
+
+  // Slight delay before showing iframe so accidental mouse-overs don't flash it
+  const handleMouseEnter = () => {
+    setHovered(true);
+    if (hasVideo) {
+      hoverTimerRef.current = setTimeout(() => setShowVideo(true), 200);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+    clearTimeout(hoverTimerRef.current);
+    setShowVideo(false);
+    setMuted(true); // reset mute when card leaves
+  };
+
+  const toggleMute = (e) => {
+    e.stopPropagation();
+    setMuted(prev => !prev);
+  };
+
+  // Build current iframe src (key changes force re-render = new mute state)
+  const iframeSrc = buildVideoSrc(project.videoUrl, muted);
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.3 }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={() => onSelect(project)}
+      style={{
+        background: 'linear-gradient(145deg, rgba(20,29,51,0.6) 0%, rgba(10,14,26,0.8) 100%)',
+        border: `1px solid ${hovered ? 'rgba(0,212,255,0.2)' : 'rgba(255,255,255,0.05)'}`,
+        borderRadius: '1rem',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+        boxShadow: hovered ? '0 20px 48px rgba(0,0,0,0.45)' : '0 4px 20px rgba(0,0,0,0.25)',
+        position: 'relative'
+      }}
+    >
+      {/* ── Media area ──────────────────────────────────── */}
+      <div style={{ height: '220px', overflow: 'hidden', position: 'relative', background: '#0a0e1a' }}>
+
+        {/* Always show the image underneath */}
+        <img
+          src={project.image}
+          alt={project.title}
+          loading="lazy"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+            transition: 'transform 0.5s ease, opacity 0.35s ease',
+            transform: hovered && !hasVideo ? 'scale(1.07)' : 'scale(1)',
+            opacity: showVideo ? 0 : 1,
+            position: showVideo ? 'absolute' : 'relative',
+            inset: 0
+          }}
+        />
+
+        {/* Iframe — only when video URL exists AND hover started */}
+        {hasVideo && showVideo && (
+          <iframe
+            key={`${project.id}-${muted}`} /* remount when mute flips */
+            src={iframeSrc}
+            title={project.title}
+            allow="autoplay; encrypted-media; fullscreen"
+            allowFullScreen
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              border: 'none',
+              display: 'block',
+            }}
+          />
+        )}
+
+        {/* Play badge — shown on hover when video exists and iframe not yet ready */}
+        {hasVideo && hovered && !showVideo && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0,0,0,0.35)',
+            backdropFilter: 'blur(2px)'
+          }}>
+            <div style={{
+              width: '48px', height: '48px',
+              borderRadius: '50%',
+              background: 'rgba(0,212,255,0.9)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 0 24px rgba(0,212,255,0.5)'
+            }}>
+              <FaPlay style={{ color: '#0a0e1a', fontSize: '1rem', marginLeft: '3px' }} />
+            </div>
+          </div>
+        )}
+
+        {/* Mute / Unmute button — only when video is playing */}
+        {hasVideo && showVideo && (
+          <button
+            onClick={toggleMute}
+            title={muted ? 'Unmute' : 'Mute'}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              right: '10px',
+              zIndex: 20,
+              width: '34px',
+              height: '34px',
+              borderRadius: '50%',
+              background: 'rgba(0,0,0,0.7)',
+              border: '1px solid rgba(255,255,255,0.25)',
+              color: '#fff',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '0.85rem',
+              backdropFilter: 'blur(4px)',
+              transition: 'background 0.2s ease, transform 0.2s ease'
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,212,255,0.8)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.7)'}
+          >
+            {muted ? <FaVolumeMute /> : <FaVolumeUp />}
+          </button>
+        )}
+
+        {/* Video indicator chip — shown when no hover, for cards that have video */}
+        {hasVideo && !hovered && (
+          <div style={{
+            position: 'absolute',
+            bottom: '8px',
+            left: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+            padding: '0.28rem 0.65rem',
+            background: 'rgba(0,0,0,0.65)',
+            border: '1px solid rgba(0,212,255,0.3)',
+            borderRadius: '999px',
+            backdropFilter: 'blur(4px)'
+          }}>
+            <FaPlay style={{ fontSize: '0.6rem', color: '#00d4ff' }} />
+            <span style={{ fontSize: '0.68rem', color: '#00d4ff', fontWeight: 600 }}>Preview</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── Card Content ─────────────────────────────── */}
+      <div style={{ padding: '1.5rem' }} onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+          <span style={{ fontSize: '0.75rem', color: '#00d4ff', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            {project.category}
+          </span>
+        </div>
+
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+          {project.title}
+        </h3>
+
+        <p style={{ fontSize: '0.875rem', color: '#94a3b8', lineHeight: 1.6, marginBottom: '1rem' }}>
+          {project.description}
+        </p>
+
+        {/* Tech tags */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.25rem' }}>
+          {project.tech.map((t, i) => (
+            <span key={i} style={{
+              fontSize: '0.72rem',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              padding: '0.22rem 0.55rem',
+              borderRadius: '4px',
+              color: '#cbd5e1'
+            }}>{t}</span>
+          ))}
+        </div>
+
+        {/* Action links */}
+        <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
+          {project.links.live && (
+            <a href={project.links.live} target="_blank" rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              style={{
+                flex: 1, textAlign: 'center', padding: '0.5rem',
+                background: 'linear-gradient(90deg,#00d4ff,#8b5cf6)',
+                color: '#fff', borderRadius: '8px',
+                fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none'
+              }}>
+              Live
+            </a>
+          )}
+          {project.links.github && (
+            <a href={project.links.github} target="_blank" rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              style={{
+                flex: 1, textAlign: 'center', padding: '0.5rem',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#fff', borderRadius: '8px',
+                fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none'
+              }}>
+              GitHub
+            </a>
+          )}
+          {project.links.figma && (
+            <a href={project.links.figma} target="_blank" rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              style={{
+                flex: 1, textAlign: 'center', padding: '0.5rem',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#fff', borderRadius: '8px',
+                fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none'
+              }}>
+              Figma
+            </a>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 /**
  * Projects Page - Horizontal Scroll Gallery
  * Features: Horizontal scroll, 3D card effects, filterable grid
@@ -27,7 +287,6 @@ gsap.registerPlugin(ScrollTrigger);
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedProject, setSelectedProject] = useState(null);
-  const [hoveredProject, setHoveredProject] = useState(null);
 
   const categories = ['All', 'HTML/CSS', 'MERN', 'Figma', 'Hackathons'];
 
@@ -38,7 +297,7 @@ const Projects = () => {
       category: 'MERN',
       description: 'A full-featured e-commerce platform with real-time inventory, payment processing, and admin dashboard.',
       image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1', // Placeholder for GDrive
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // replace with your real video embed URL
       tech: ['React', 'Node.js', 'MongoDB', 'Stripe'],
       links: {
         live: 'https://example.com',
@@ -54,7 +313,7 @@ const Projects = () => {
       category: 'MERN',
       description: 'Collaborative task management with real-time updates using Socket.io and team workspaces.',
       image: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=600&fit=crop',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1',
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // replace with your real video embed URL
       tech: ['MERN', 'Socket.io', 'Redux'],
       links: {
         live: 'https://example.com',
@@ -70,7 +329,7 @@ const Projects = () => {
       category: 'HTML/CSS',
       description: 'Responsive portfolio website with modern animations and clean UI.',
       image: 'https://images.unsplash.com/photo-1545665277-509919b38c21?w=800&h=600&fit=crop',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1',
+      videoUrl: null, // no video — image only
       tech: ['HTML5', 'CSS3', 'JavaScript'],
       links: {
         live: 'https://example.com',
@@ -86,7 +345,7 @@ const Projects = () => {
       category: 'Figma',
       description: 'High-fidelity prototype for a modern banking application with comprehensive design system.',
       image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&h=600&fit=crop',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1',
+      videoUrl: null, // no video — image only
       tech: ['Figma', 'Prototyping', 'UI/UX'],
       links: {
         live: null,
@@ -102,7 +361,7 @@ const Projects = () => {
       category: 'Hackathons',
       description: 'Award-winning solution for sustainable energy tracking built in 48 hours.',
       image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=600&fit=crop',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1',
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // replace with your real video embed URL
       tech: ['React', 'Python', 'IoT'],
       links: {
         live: 'https://example.com',
@@ -334,218 +593,12 @@ const Projects = () => {
             }}
           >
             <AnimatePresence mode="popLayout">
-              {filteredProjects.map((project, index) => (
-                <motion.div
+              {filteredProjects.map((project) => (
+                <VideoProjectCard
                   key={project.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                  onMouseEnter={() => setHoveredProject(project.id)}
-                  onMouseLeave={() => setHoveredProject(null)}
-                  style={{
-                    background: 'linear-gradient(145deg, rgba(20, 29, 51, 0.6) 0%, rgba(10, 14, 26, 0.8) 100%)',
-                    border: '1px solid rgba(255, 255, 255, 0.05)',
-                    borderRadius: '1rem',
-                    overflow: 'hidden',
-                    transition: 'all 0.3s ease',
-                    position: 'relative'
-                  }}
-                >
-                  {/* Image/Video Container */}
-                  <div style={{ 
-                    height: '220px', 
-                    overflow: 'hidden', 
-                    position: 'relative'
-                  }}>
-                    {hoveredProject === project.id && project.videoUrl ? (
-                      <div style={{ width: '100%', height: '100%' }}>
-                        <iframe
-                          src={project.videoUrl}
-                          title={project.title}
-                          style={{ width: '100%', height: '100%', border: 'none' }}
-                          allow="autoplay; encrypted-media"
-                        />
-                        {/* Overlay Controls */}
-                        <div style={{
-                          position: 'absolute',
-                          top: '10px',
-                          right: '10px',
-                          display: 'flex',
-                          gap: '0.5rem',
-                          zIndex: 10
-                        }}>
-                          <button style={{
-                            background: 'rgba(0,0,0,0.6)',
-                            border: '1px solid rgba(255,255,255,0.2)',
-                            color: '#fff',
-                            borderRadius: '50%',
-                            width: '32px',
-                            height: '32px',
-                            cursor: 'pointer',
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center'
-                          }} title="Unmute">
-                             🔊
-                          </button>
-                           <button style={{
-                            background: 'rgba(0,0,0,0.6)',
-                            border: '1px solid rgba(255,255,255,0.2)',
-                            color: '#fff',
-                            borderRadius: '50%',
-                            width: '32px',
-                            height: '32px',
-                            cursor: 'pointer',
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center'
-                          }} title="Fullscreen">
-                             ⛶
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <img
-                        src={project.image}
-                        alt={project.title}
-                        loading="lazy"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          transition: 'transform 0.5s ease',
-                          transform: hoveredProject === project.id ? 'scale(1.1)' : 'scale(1)'
-                        }}
-                      />
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div style={{ padding: '1.5rem' }}>
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginBottom: '0.75rem'
-                    }}>
-                      <span style={{
-                        fontSize: '0.75rem',
-                        color: '#00d4ff',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px'
-                      }}>
-                        {project.category}
-                      </span>
-                    </div>
-
-                    <h3 style={{
-                      fontSize: '1.25rem',
-                      fontWeight: 700,
-                      marginBottom: '0.5rem'
-                    }}>
-                      {project.title}
-                    </h3>
-                    
-                    <p style={{
-                      fontSize: '0.875rem',
-                      color: '#94a3b8',
-                      lineHeight: 1.6,
-                      marginBottom: '1rem'
-                    }}>
-                      {project.description}
-                    </p>
-
-                    {/* Tech Stack Tags */}
-                    <div style={{ 
-                      display: 'flex', 
-                      flexWrap: 'wrap', 
-                      gap: '0.5rem', 
-                      marginBottom: '1.5rem' 
-                    }}>
-                      {project.tech.map((t, i) => (
-                        <span key={i} style={{
-                          fontSize: '0.75rem',
-                          background: 'rgba(255,255,255,0.05)',
-                          padding: '0.25rem 0.5rem',
-                          borderRadius: '4px',
-                          color: '#cbd5e1'
-                        }}>
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div style={{ 
-                      display: 'flex', 
-                      gap: '0.75rem',
-                      flexWrap: 'wrap'
-                    }}>
-                      {project.links.live && (
-                        <a href={project.links.live} target="_blank" rel="noopener noreferrer" style={{
-                          flex: 1,
-                          textAlign: 'center',
-                          padding: '0.5rem',
-                          background: '#00d4ff',
-                          color: '#0a0e1a',
-                          borderRadius: '8px',
-                          fontSize: '0.875rem',
-                          fontWeight: 600,
-                          textDecoration: 'none'
-                        }}>
-                          Live
-                        </a>
-                      )}
-                       {project.links.github && (
-                        <a href={project.links.github} target="_blank" rel="noopener noreferrer" style={{
-                          flex: 1,
-                          textAlign: 'center',
-                          padding: '0.5rem',
-                          background: 'rgba(255,255,255,0.1)',
-                          color: '#fff',
-                          borderRadius: '8px',
-                          fontSize: '0.875rem',
-                          fontWeight: 600,
-                          textDecoration: 'none'
-                        }}>
-                          GitHub
-                        </a>
-                      )}
-                       {project.links.figma && (
-                        <a href={project.links.figma} target="_blank" rel="noopener noreferrer" style={{
-                          flex: 1,
-                          textAlign: 'center',
-                          padding: '0.5rem',
-                          background: 'rgba(255,255,255,0.1)',
-                          color: '#fff',
-                          borderRadius: '8px',
-                          fontSize: '0.875rem',
-                          fontWeight: 600,
-                          textDecoration: 'none'
-                        }}>
-                          Figma
-                        </a>
-                      )}
-                      {project.links.api && (
-                        <a href={project.links.api} target="_blank" rel="noopener noreferrer" style={{
-                          flex: 1,
-                          textAlign: 'center',
-                          padding: '0.5rem',
-                          background: 'rgba(255,255,255,0.1)',
-                          color: '#fff',
-                          borderRadius: '8px',
-                          fontSize: '0.875rem',
-                          fontWeight: 600,
-                          textDecoration: 'none'
-                        }}>
-                          API
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
+                  project={project}
+                  onSelect={setSelectedProject}
+                />
               ))}
             </AnimatePresence>
           </motion.div>
@@ -554,9 +607,9 @@ const Projects = () => {
         {/* Project Modal */}
         <AnimatePresence>
           {selectedProject && (
-            <ProjectModal 
-              project={selectedProject} 
-              onClose={() => setSelectedProject(null)} 
+            <ProjectModal
+              project={selectedProject}
+              onClose={() => setSelectedProject(null)}
             />
           )}
         </AnimatePresence>
