@@ -537,33 +537,7 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          style={{
-            position: 'absolute',
-            bottom: '2rem',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '0.5rem',
-            color: '#64748b'
-          }}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.5 }}
-        >
-          <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '2px' }}>
-            Scroll
-          </span>
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <FaArrowDown size={16} />
-          </motion.div>
-        </motion.div>
+
       </main>
     </>
   );
