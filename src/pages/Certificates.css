@@ -12,14 +12,14 @@
 .certificates-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: var(--spacing-2xl);
-  margin-top: var(--spacing-2xl);
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
   perspective: 1000px;
 }
 
 /* Flip Card Container */
 .flip-card {
-  height: 500px;
+  height: 420px;
   cursor: pointer;
   position: relative;
   transition: transform 0.3s ease;
@@ -64,7 +64,7 @@
 .cert-front-image {
   position: relative;
   width: 100%;
-  height: 250px;
+  height: 200px;
   overflow: hidden;
   background: var(--color-bg-tertiary);
 }
