@@ -24,11 +24,53 @@ const Certificates = () => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [hoveredCert, setHoveredCert] = useState(null);
 
-  const categories = ['All', 'Development', 'Cloud', 'Data Science', 'Events'];
+  const categories = ['All', 'Certificates', 'Development', 'Cloud', 'Data Science', 'Events'];
 
   const certificates = [
     {
       id: 1,
+      title: "HackTheWinter Participation Certificate",
+  issuer: "DreamBuilders",
+  date: "December 2025",
+  description: "Participated in HackTheWinter organized by DreamBuilders, where we built the project 'Smart Emergency Blood Network'. The event provided hands-on experience in developing impactful real-world solutions while collaborating effectively in a team environment. This experience strengthened my problem-solving, innovation, and execution skills under time constraints.",
+  skills: ["Full-Stack Development", "Team Collaboration", "Problem Solving", "Project Execution"],
+  image: "https://res.cloudinary.com/dtkzxbcjx/image/upload/v1772209053/Dhruv_Sonagra_DreamBuilders_certificate_page-0001_es78an.jpg",
+  link: "https://www.linkedin.com/posts/dhruvvv23_hackthewinter-dreambuilders-smartemergencybloodnetwork-activity-7423229138368520192-7tHU?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFFbQIEBNyvXKq2e2we3ieNXl2L1zznWXvo",
+  category: "Certificates",
+  icon: <FaCertificate />,
+  color: "#FF9800",
+  featured: true
+    },
+    {
+      id: 2,
+      title: "Generative AI & Machine Learning Certification",
+      issuer: "EduSkills Foundation & AICTE (in collaboration with Google)",
+      date: "October 2025",
+      description: "Successfully completed the Generative AI & Machine Learning Certification through the Google & EduSkills Foundation Program (in collaboration with AICTE). Learned advanced concepts and practical techniques in generative AI and applied ML models. Grateful for the opportunity and excited to implement these skills in real-world projects and innovative solutions.",
+      skills: ["Generative AI", "Machine Learning", "AI Applications", "Hands-On Implementation"],
+      image: "https://res.cloudinary.com/dtkzxbcjx/image/upload/v1772209397/1760348600191_qiuslz.jpg",
+      link: "https://www.linkedin.com/posts/dhruvvv23_generativeai-ai-machinelearning-activity-7383437181127708672-_u7S?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFFbQIEBNyvXKq2e2we3ieNXl2L1zznWXvo",
+      category: 'Certificates',
+      icon: <FaCertificate />,
+      color: '#673AB7',
+      featured: true
+    },
+    {
+      id: 3,
+      title: "Google AI-ML Virtual Internship Completion",
+      issuer: "EduSkills Foundation & AICTE (in collaboration with Google)",
+      date: "September 2025",
+      description: "Successfully completed the Google AI-ML Virtual Internship through EduSkills Foundation in collaboration with AICTE and the India Edu Program. Gained deep understanding of Artificial Intelligence and Machine Learning with hands-on exposure to real-world applications. Expressed gratitude to Google, EduSkills Foundation, AICTE, and India Edu Program team for this impactful learning experience. Looking forward to applying these skills in practical projects and meaningful innovations.",
+      skills: ["Artificial Intelligence", "Machine Learning", "Hands-On Implementation", "Continuous Learning"],
+      image: "https://res.cloudinary.com/dtkzxbcjx/image/upload/v1772209028/1758695751122_dmf3nc.jpg",
+      link: "https://www.linkedin.com/posts/dhruvvv23_i-am-excited-to-share-that-i-have-successfully-activity-7376504630484279297-9UwA?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFFbQIEBNyvXKq2e2we3ieNXl2L1zznWXvo",
+      category: 'Certificates',
+      icon: <FaCertificate />,
+      color: '#2196F3',
+      featured: true
+    },
+    {
+      id: 4,
       title: "Hackathon 2025",
       issuer: "OdooXGujarat Vidhyapith",
       date: "April 2025",
@@ -42,7 +84,7 @@ const Certificates = () => {
       featured: true
     },
     {
-      id: 2,
+      id: 5,
       title: "Tech Expo 2025",
       issuer: "Rai University",
       date: "February 2025",
@@ -56,7 +98,7 @@ const Certificates = () => {
       featured: true
     },
     {
-      id: 3,
+      id: 6,
       title: "Microsoft PowerBi and Fundamentals",
       issuer: "Rai University",
       date: "April 2025",
@@ -70,7 +112,7 @@ const Certificates = () => {
       featured: false
     },
     {
-      id: 4,
+      id: 7,
       title: "Azure Fundamentals",
       issuer: "Rai University",
       date: "April 2025",
@@ -84,7 +126,7 @@ const Certificates = () => {
       featured: false
     },
     {
-      id: 5,
+      id: 8,
       title: "Introduction to the Basics of Azure Services",
       issuer: "Simplilearn",
       date: "May 2025",
@@ -98,7 +140,7 @@ const Certificates = () => {
       featured: false
     },
     {
-      id: 6,
+      id: 9,
       title: "Node.js (Basic)",
       issuer: "Hackerrank",
       date: "May 2025",
@@ -112,7 +154,7 @@ const Certificates = () => {
       featured: false
     },
     {
-      id: 7,
+      id: 10,
       title: "React (Basic)",
       issuer: "Hackerrank",
       date: "May 2025",
@@ -126,7 +168,7 @@ const Certificates = () => {
       featured: true
     },
     {
-      id: 8,
+      id: 11,
       title: "Javascript (Basic)",
       issuer: "Hackerrank",
       date: "May 2025",
@@ -140,7 +182,7 @@ const Certificates = () => {
       featured: false
     },
     {
-      id: 9,
+      id: 12,
       title: "Problem Solving (Basic)",
       issuer: "Hackerrank",
       date: "May 2025",
@@ -154,7 +196,7 @@ const Certificates = () => {
       featured: false
     },
     {
-      id: 10,
+      id: 13,
       title: "Frontend Development (Basic)",
       issuer: "Hackerrank",
       date: "May 2025",
@@ -168,7 +210,7 @@ const Certificates = () => {
       featured: false
     },
     {
-      id: 11,
+      id: 14,
       title: "Github Copilot Fundamentals",
       issuer: "Simplilearn",
       date: "May 2025",
@@ -182,7 +224,7 @@ const Certificates = () => {
       featured: true
     },
     {
-      id: 12,
+      id: 15,
       title: "Problem Solving (Intermediate)",
       issuer: "Hackerrank",
       date: "May 2025",
@@ -196,7 +238,7 @@ const Certificates = () => {
       featured: true
     },
     {
-      id: 13,
+      id: 16,
       title: "Javascript (Intermediate)",
       issuer: "Hackerrank",
       date: "June 2025",
