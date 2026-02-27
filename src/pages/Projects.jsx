@@ -341,41 +341,236 @@ const Projects = () => {
     },
     {
       id: 4,
-      title: 'Mobile Banking App',
-      category: 'Figma',
-      description: 'High-fidelity prototype for a modern banking application with comprehensive design system.',
-      image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&h=600&fit=crop',
-      videoUrl: null, // no video — image only
-      tech: ['Figma', 'Prototyping', 'UI/UX'],
-      links: {
-        live: null,
-        github: null,
-        figma: 'https://figma.com',
-        api: null
-      },
-      featured: false
-    },
-    {
-      id: 5,
       title: 'Hackathon Project 2024',
       category: 'Hackathons',
       description: 'Award-winning solution for sustainable energy tracking built in 48 hours.',
       image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=600&fit=crop',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // replace with your real video embed URL
+      videoUrl: null,
       tech: ['React', 'Python', 'IoT'],
       links: {
         live: 'https://example.com',
         github: 'https://github.com',
         figma: null,
-        api: 'https://api.example.com'
+        api: null
       },
       featured: true
+    },
+    {
+      id: 5,
+      title: 'Eventura (Figma)',
+      category: 'Figma',
+      description: 'A clean and modern dashboard interface design with white mode support.',
+      image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1739943406/eventura_tuntzx.png',
+      videoUrl: null,
+      tech: ['Figma', 'Auto Layout', 'Components', 'Variants'],
+      links: {
+        live: null,
+        github: null,
+        figma: 'https://www.figma.com/design/VTpYgGhHaIuRfob33itg2p/codinggita?node-id=124-532&t=vtIPVwzy8GVvCr3a-1',
+        api: null
+      },
+      featured: true
+    },
+    {
+      id: 6,
+      title: 'CodingGita (Figma)',
+      category: 'Figma',
+      description: 'CodingGita is a well-structured and visually appealing website page design.',
+      image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1740253761/wfdtwsnrsexc4xkkumvw.png',
+      videoUrl: null,
+      tech: ['Figma', 'Auto Layout', 'Components', 'Variants'],
+      links: {
+        live: null,
+        github: null,
+        figma: 'https://www.figma.com/design/VTpYgGhHaIuRfob33itg2p/codinggita?node-id=138-5416&t=vtIPVwzy8GVvCr3a-1',
+        api: null
+      },
+      featured: false
+    },
+    {
+      id: 7,
+      title: 'Furnishly (Figma)',
+      category: 'Figma',
+      description: 'Furnishly features a sleek and intuitive interface with a focus on user experience.',
+      image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1740253407/j0jnuta7tknmxkfrplka.jpg',
+      videoUrl: null,
+      tech: ['Figma', 'Auto Layout', 'Components', 'Variants'],
+      links: {
+        live: null,
+        github: null,
+        figma: 'https://www.figma.com/design/VTpYgGhHaIuRfob33itg2p/codinggita?node-id=124-532&t=vtIPVwzy8GVvCr3a-1',
+        api: null
+      },
+      featured: false
+    },
+    {
+      id: 8,
+      title: 'Farmtrust (Figma)',
+      category: 'Figma',
+      description: 'FarmTrust is a comprehensive platform for farmers, offering real-time updates, an AI chatbot for assistance, and a user-friendly interface. It connects farmers with buyers, ensuring efficient transactions and support.',
+      image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1747942311/Screenshot_2025-05-23_005646_qd6hzt.png',
+      videoUrl: null,
+      tech: ['Figma', 'Auto Layout', 'Components', 'Variants'],
+      links: {
+        live: null,
+        github: null,
+        figma: 'https://www.figma.com/design/SNuN8wbnReIue8nUOJhjEG/Untitled?node-id=0-1&t=EmfBEpHrp46N2K5m-1',
+        api: null
+      },
+      featured: false
+    },
+    {
+      id: 9,
+      title: 'Purple',
+      category: 'HTML/CSS',
+      description: 'E-commerce platform with modern UI and seamless shopping experience.',
+      image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1739943602/bgrat7sxisqwumu4x1vn.png',
+      videoUrl: null,
+      tech: ['React', 'Tailwind CSS'],
+      links: {
+        live: 'https://purple21.netlify.app/',
+        github: 'https://github.com/dhruv2311-dot/PURPLE',
+        figma: null,
+        api: null
+      },
+      featured: true
+    },
+    {
+      id: 10,
+      title: 'PharmEasy',
+      category: 'HTML/CSS',
+      description: 'Online pharmacy platform with medicine delivery system.',
+      image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1739943561/y4vnpuulvuibf86l0dj9.png',
+      videoUrl: null,
+      tech: ['HTML', 'CSS', 'JavaScript'],
+      links: {
+        live: 'https://bespoke-blini-7c10e3.netlify.app/',
+        github: 'https://github.com/dhruv2311-dot/pharmeasy',
+        figma: null,
+        api: null
+      },
+      featured: false
+    },
+    {
+      id: 11,
+      title: 'HireAVilla',
+      category: 'HTML/CSS',
+      description: 'Property booking platform with advanced filtering and booking system.',
+      image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1739943420/hireavilla_ag5gso.png',
+      videoUrl: null,
+      tech: ['HTML', 'CSS', 'JavaScript'],
+      links: {
+        live: 'https://hireavilla12.netlify.app/',
+        github: 'https://github.com/dhruv2311-dot/HIREAVILLA',
+        figma: null,
+        api: null
+      },
+      featured: false
+    },
+    {
+      id: 12,
+      title: 'Netflix',
+      category: 'MERN',
+      description: 'A Netflix clone built with React, featuring a responsive design, smooth navigation, and dynamic content loading. It offers a seamless streaming experience with an intuitive user interface.',
+      image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1747942711/Screenshot_2025-05-23_010754_duojcu.png',
+      videoUrl: null,
+      tech: ['React', 'Tailwind CSS'],
+      links: {
+        live: 'https://netflix-u9ng.onrender.com/',
+        github: 'https://github.com/dhruv2311-dot/netflix',
+        figma: null,
+        api: null
+      },
+      featured: true
+    },
+    {
+      id: 13,
+      title: 'Tic-Tac-Toe',
+      category: 'MERN',
+      description: 'A classic Tic Tac Toe game developed using React, featuring a responsive UI, smooth gameplay, and dynamic state management for an engaging experience.',
+      image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1740157368/gtsplesiovqz4emqthn2.png',
+      videoUrl: null,
+      tech: ['React', 'Tailwind CSS'],
+      links: {
+        live: 'https://tic-tac-toe-sandy-two.vercel.app/',
+        github: 'https://github.com/dhruv2311-dot/Tic-Tac-Toe',
+        figma: null,
+        api: null
+      },
+      featured: false
+    },
+    {
+      id: 14,
+      title: 'Eventura',
+      category: 'MERN',
+      description: 'Event management platform with real-time updates and interactive features.',
+      image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1739943406/eventura_tuntzx.png',
+      videoUrl: null,
+      tech: ['React', 'Node.js', 'Express', 'MongoDB'],
+      links: {
+        live: 'https://eventura-23.netlify.app/',
+        github: 'https://github.com/dhruv2311-dot/eventura-',
+        figma: null,
+        api: 'https://documenter.getpostman.com/view/39189509/2sAYX3s4Dc'
+      },
+      featured: true
+    },
+    {
+      id: 15,
+      title: 'Farmtrust',
+      category: 'MERN',
+      description: 'FarmTrust is a comprehensive platform for farmers, offering real-time updates, an AI chatbot for assistance, and a user-friendly interface. It connects farmers with buyers, ensuring efficient transactions and support.',
+      image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1747942311/Screenshot_2025-05-23_005646_qd6hzt.png',
+      videoUrl: null,
+      tech: ['React', 'Node.js', 'MongoDB', 'Express', 'Socket.io', 'AI Chatbot', 'i18n', 'Authentication'],
+      links: {
+        live: 'https://farmtrust.netlify.app/',
+        github: 'https://github.com/dhruv2311-dot/FarmTrust',
+        figma: null,
+        api: 'https://documenter.getpostman.com/view/39189509/2sAYX3s4Dc'
+      },
+      featured: true
+    },
+    {
+      id: 16,
+      title: 'Youtube',
+      category: 'MERN',
+      description: 'A dynamic YouTube clone featuring real-time video updates, interactive UI, and seamless streaming. Built with React and Node.js, it integrates a custom YouTube API for personalized content delivery.',
+      image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1740156747/Screenshot_2025-02-21_221308_uqsfq2.png',
+      videoUrl: null,
+      tech: ['React', 'Node.js', 'Express', 'MongoDB'],
+      links: {
+        live: 'https://youtube-api-lomc.vercel.app/',
+        github: 'https://github.com/dhruv2311-dot/Youtube-API',
+        figma: null,
+        api: null
+      },
+      featured: false
+    },
+    {
+      id: 17,
+      title: 'Spotify',
+      category: 'MERN',
+      description: 'A sleek Spotify clone built using React with a modular, component-based architecture. It offers seamless music playback, dynamic UI updates, and an interactive user experience.',
+      image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1740156966/igvbvpgmgyzkbrthcdma.png',
+      videoUrl: null,
+      tech: ['React', 'Node.js', 'Express', 'MongoDB'],
+      links: {
+        live: 'https://spotify-react-component.vercel.app/',
+        github: 'https://github.com/dhruv2311-dot/spotify-react-component',
+        figma: null,
+        api: null
+      },
+      featured: false
     }
   ];
 
-  const filteredProjects = activeFilter === 'All' 
-    ? projects 
-    : projects.filter(p => p.category === activeFilter);
+  const categoryOrder = { 'Hackathons': 0, 'MERN': 1, 'HTML/CSS': 2, 'Figma': 3 };
+
+  const filteredProjects = (activeFilter === 'All'
+    ? projects
+    : projects.filter(p => p.category === activeFilter)
+  ).slice().sort((a, b) => (categoryOrder[a.category] ?? 99) - (categoryOrder[b.category] ?? 99));
 
   const featuredProjects = projects.filter(p => p.featured);
 
