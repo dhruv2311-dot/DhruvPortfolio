@@ -7,16 +7,21 @@ import Lenis from 'lenis';
  */
 const useSmoothScroll = () => {
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
     // Initialize Lenis with optimized settings
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 0.9,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing
       direction: 'vertical',
       gestureDirection: 'vertical',
       smooth: true,
-      mouseMultiplier: 1,
+      mouseMultiplier: 0.9,
       smoothTouch: false,
-      touchMultiplier: 2,
+      touchMultiplier: 1.2,
       infinite: false,
     });
 

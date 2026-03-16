@@ -16,6 +16,7 @@ const Navigation = () => {
   const navRef = useRef(null);
   const indicatorRef = useRef(null);
   const linksRef = useRef([]);
+  const isScrolledRef = useRef(false);
 
   const navLinks = [
     { path: '/', label: 'Home', icon: '01' },
@@ -29,12 +30,27 @@ const Navigation = () => {
 
   // Handle scroll effect
   useEffect(() => {
+    let rafId = null;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      if (rafId) return;
+
+      rafId = requestAnimationFrame(() => {
+        const nextScrolled = window.scrollY > 50;
+        if (nextScrolled !== isScrolledRef.current) {
+          isScrolledRef.current = nextScrolled;
+          setIsScrolled(nextScrolled);
+        }
+        rafId = null;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // Update active indicator position

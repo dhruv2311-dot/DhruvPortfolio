@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -15,6 +15,7 @@ import Footer from './components/Footer';
 import Cursor from './components/Cursor';
 import ScrollProgress from './components/ScrollProgress';
 import PageTransition from './components/PageTransition';
+import useSmoothScroll from './hooks/useSmoothScroll';
 
 // Pages
 import Home from './pages/Home';
@@ -41,12 +42,54 @@ function ScrollToTop() {
   return null;
 }
 
+function SnowfallLayer({ snowflakeCount }) {
+  if (snowflakeCount <= 0) {
+    return null;
+  }
+
+  return (
+    <Snowfall
+      color="#00d4ff"
+      snowflakeCount={snowflakeCount}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 1,
+        pointerEvents: 'none'
+      }}
+      radius={[0.4, 2]}
+      speed={[0.8, 2.2]}
+      wind={[-0.3, 0.5]}
+    />
+  );
+}
+
 /**
  * Main App Component
  * Orchestrates all global features and routing
  */
 function App() {
   const [isLoading, setIsLoading] = useState(true);
+  useSmoothScroll();
+
+  const shouldReduceMotion = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
+  const snowflakeCount = useMemo(() => {
+    if (shouldReduceMotion) return 0;
+    if (typeof window === 'undefined') return 70;
+
+    const isMobile = window.innerWidth < 768;
+    const lowCpu = (navigator.hardwareConcurrency || 8) <= 6;
+
+    if (isMobile || lowCpu) return 20;
+    return 70;
+  }, [shouldReduceMotion]);
 
   // Initial loading animation
   useEffect(() => {
@@ -130,22 +173,7 @@ function App() {
         
         <div className="app" style={{ minHeight: '100vh', position: 'relative' }}>
           {/* Snowfall Effect */}
-          <Snowfall
-            color="#00d4ff"
-            snowflakeCount={200}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              zIndex: 1,
-              pointerEvents: 'none'
-            }}
-            radius={[0.5, 3]}
-            speed={[1.5, 4]}
-            wind={[-0.5, 1]}
-          />
+          <SnowfallLayer snowflakeCount={snowflakeCount} />
           
           {/* Navigation */}
           <Navigation />

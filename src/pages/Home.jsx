@@ -222,7 +222,7 @@ const Home = () => {
           justifyContent: 'center',
           paddingTop: '80px',
           position: 'relative',
-          overflow: 'hidden'
+          overflowX: 'hidden'
         }}
       >
         {/* Background Elements */}
