@@ -234,7 +234,7 @@ const About = () => {
                   style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}
                 >
                   <motion.a
-                    href="https://drive.google.com/file/d/1FjF18VC8QK7bAad8wifswbDqiojUBKXe/view?usp=sharing"
+                    href="https://drive.google.com/file/d/16PhnI0TIbZ2O18uKjFpml7jxzh_m9SJg/view?usp=sharing"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="about-btn-primary"
