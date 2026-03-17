@@ -503,6 +503,12 @@
   margin-bottom: 0.55rem;
 }
 
+.about-github-contrib-note {
+  color: #64748b;
+  font-size: 0.76rem;
+  margin-bottom: 0.6rem;
+}
+
 .about-github-contrib-head {
   display: flex;
   align-items: center;

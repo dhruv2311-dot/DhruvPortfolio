@@ -149,7 +149,7 @@ const ProgressRow = ({ label, solved, total, color, subtitle }) => {
 
 const GITHUB_USERNAME = 'dhruv2311-dot';
 const LEETCODE_USERNAME = 'dhruvvv_23';
-const LIVE_REFRESH_MS = 120000;
+const LIVE_REFRESH_MS = 60000;
 const LEETCODE_GRAPHQL_ENDPOINT = 'https://leetcode.com/graphql';
 const LEETCODE_PROFILE_ENDPOINT = `https://leetcode-api-faisalshohag.vercel.app/${LEETCODE_USERNAME}`;
 const LEETCODE_CONTEST_ENDPOINT = `https://alfa-leetcode-api.onrender.com/userContestRankingInfo/${LEETCODE_USERNAME}`;
@@ -157,6 +157,11 @@ const GITHUB_CONTRIBUTIONS_HISTORY_ENDPOINT = `https://github-contributions-api.
 const DEFAULT_LEETCODE_CONTEST = {
   contestRanking: 414102,
   contestsAttended: 6
+};
+const VERIFIED_GITHUB_YEARLY_BASELINE = {
+  2026: 393,
+  2025: 702,
+  2024: 104
 };
 
 const STATIC_CONTRIBUTIONS_TOTAL = 928;
@@ -246,6 +251,19 @@ const clampHeatLevel = (level) => {
   const numeric = Number(level);
   if (!Number.isFinite(numeric)) return 0;
   return Math.max(0, Math.min(4, numeric));
+};
+
+const mergeYearlyTotals = (apiTotals = {}) => {
+  const merged = { ...apiTotals };
+
+  Object.entries(VERIFIED_GITHUB_YEARLY_BASELINE).forEach(([year, baseline]) => {
+    const current = Number(merged[year]);
+    merged[year] = Number.isFinite(current)
+      ? Math.max(current, baseline)
+      : baseline;
+  });
+
+  return merged;
 };
 
 const buildYearContributionView = (entries = [], year, yearlyTotals = {}) => {
@@ -356,7 +374,7 @@ const About = () => {
     monthLabels: STATIC_MONTH_LABELS,
     yearLabel: new Date().getFullYear(),
     years: [new Date().getFullYear()],
-    totalsByYear: {},
+    totalsByYear: mergeYearlyTotals({}),
     historyEntries: []
   });
   const [selectedContributionYear, setSelectedContributionYear] = useState(new Date().getFullYear());
@@ -460,7 +478,8 @@ const About = () => {
 
         if (contributionsRes.ok) {
           const contributionsJson = await contributionsRes.json();
-          const years = Object.keys(contributionsJson?.total || {})
+          const mergedTotals = mergeYearlyTotals(contributionsJson?.total || {});
+          const years = Object.keys(mergedTotals)
             .map((year) => Number(year))
             .filter((year) => Number.isFinite(year))
             .sort((a, b) => b - a);
@@ -473,14 +492,14 @@ const About = () => {
             const view = buildYearContributionView(
               contributionsJson?.contributions,
               selectedYear,
-              contributionsJson?.total
+              mergedTotals
             );
 
             return {
               ...prev,
               ...view,
               years: years.length ? years : prev.years,
-              totalsByYear: contributionsJson?.total || prev.totalsByYear,
+              totalsByYear: mergedTotals,
               historyEntries: Array.isArray(contributionsJson?.contributions)
                 ? contributionsJson.contributions
                 : prev.historyEntries
@@ -1020,6 +1039,9 @@ const About = () => {
                     <div className="about-github-contrib-card">
                       <p className="about-github-contrib-total">
                         {currentProfile.contributionsTotal} contributions in the last year
+                      </p>
+                      <p className="about-github-contrib-note">
+                        Year totals auto-refresh and include your verified profile baseline.
                       </p>
                       <div className="about-github-contrib-head">
                         <span>Contributions</span>
