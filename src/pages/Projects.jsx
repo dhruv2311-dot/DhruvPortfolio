@@ -248,6 +248,19 @@ const VideoProjectCard = ({ project, onSelect }) => {
               Live
             </a>
           )}
+          {project.links.demo && (
+            <a href={project.links.demo} target="_blank" rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              style={{
+                flex: 1, textAlign: 'center', padding: '0.5rem',
+                background: 'rgba(0,212,255,0.12)',
+                border: '1px solid rgba(0,212,255,0.3)',
+                color: '#00d4ff', borderRadius: '8px',
+                fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none'
+              }}>
+              Demo
+            </a>
+          )}
           {project.links.github && (
             <a href={project.links.github} target="_blank" rel="noopener noreferrer"
               onClick={e => e.stopPropagation()}
@@ -259,6 +272,19 @@ const VideoProjectCard = ({ project, onSelect }) => {
                 fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none'
               }}>
               GitHub
+            </a>
+          )}
+          {project.links.api && (
+            <a href={project.links.api} target="_blank" rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              style={{
+                flex: 1, textAlign: 'center', padding: '0.5rem',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#fff', borderRadius: '8px',
+                fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none'
+              }}>
+              API Docs
             </a>
           )}
           {project.links.figma && (
@@ -291,70 +317,6 @@ const Projects = () => {
   const categories = ['All', 'HTML/CSS', 'MERN', 'Figma', 'Hackathons'];
 
   const projects = [
-    {
-      id: 1,
-      title: 'E-Commerce Platform',
-      category: 'MERN',
-      description: 'A full-featured e-commerce platform with real-time inventory, payment processing, and admin dashboard.',
-      image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // replace with your real video embed URL
-      tech: ['React', 'Node.js', 'MongoDB', 'Stripe'],
-      links: {
-        live: 'https://example.com',
-        github: 'https://github.com',
-        figma: null,
-        api: 'https://api.example.com'
-      },
-      featured: true
-    },
-    {
-      id: 2,
-      title: 'Task Management App',
-      category: 'MERN',
-      description: 'Collaborative task management with real-time updates using Socket.io and team workspaces.',
-      image: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=600&fit=crop',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // replace with your real video embed URL
-      tech: ['MERN', 'Socket.io', 'Redux'],
-      links: {
-        live: 'https://example.com',
-        github: 'https://github.com',
-        figma: null,
-        api: null
-      },
-      featured: true
-    },
-    {
-      id: 3,
-      title: 'Portfolio Website',
-      category: 'HTML/CSS',
-      description: 'Responsive portfolio website with modern animations and clean UI.',
-      image: 'https://images.unsplash.com/photo-1545665277-509919b38c21?w=800&h=600&fit=crop',
-      videoUrl: null, // no video — image only
-      tech: ['HTML5', 'CSS3', 'JavaScript'],
-      links: {
-        live: 'https://example.com',
-        github: 'https://github.com',
-        figma: null,
-        api: null
-      },
-      featured: false
-    },
-    {
-      id: 4,
-      title: 'Hackathon Project 2024',
-      category: 'Hackathons',
-      description: 'Award-winning solution for sustainable energy tracking built in 48 hours.',
-      image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=600&fit=crop',
-      videoUrl: null,
-      tech: ['React', 'Python', 'IoT'],
-      links: {
-        live: 'https://example.com',
-        github: 'https://github.com',
-        figma: null,
-        api: null
-      },
-      featured: true
-    },
     {
       id: 5,
       title: 'Eventura (Figma)',
@@ -562,6 +524,108 @@ const Projects = () => {
         api: null
       },
       featured: false
+    },
+    {
+      id: 18,
+      title: 'Smart Emergency Blood Network (SEBN)',
+      category: 'Hackathons',
+      description: 'Hack The Winter project: a governed emergency blood coordination platform connecting hospitals, blood banks, and NGOs with escalation logic and audit-ready workflows.',
+      image: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=1200&h=800&fit=crop',
+      videoUrl: null,
+      tech: ['React', 'Node.js', 'Express.js', 'MongoDB', 'REST API'],
+      links: {
+        live: 'https://hackthewinter.netlify.app/',
+        demo: 'https://drive.google.com/drive/folders/1splVdZoQxYmd0r-DX-u-tqTPUxqSP3fD?usp=sharing',
+        github: 'https://github.com/dhruv2311-dot/Hack_The_Winter',
+        figma: null,
+        api: 'https://documenter.getpostman.com/view/39216723/2sBXVbJuPe'
+      },
+      featured: true
+    },
+    {
+      id: 19,
+      title: 'EcoFinds - Sustainable Second-Hand Marketplace',
+      category: 'Hackathons',
+      description: 'Built for Odoo x NMIT Hackathon 2025, EcoFinds is a full-stack marketplace focused on circular economy by helping users buy and sell pre-owned products securely.',
+      image: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=1200&h=800&fit=crop',
+      videoUrl: null,
+      tech: ['React.js', 'Node.js', 'Express.js', 'MongoDB', 'Tailwind CSS', 'JWT'],
+      links: {
+        live: 'https://ecofinds.vercel.app',
+        demo: null,
+        github: 'https://github.com/dhruv2311-dot/EcoFinds',
+        figma: null,
+        api: 'https://ecofinds-api.render.com'
+      },
+      featured: true
+    },
+    {
+      id: 20,
+      title: 'Expenseura - Smart Expense Management System',
+      category: 'Hackathons',
+      description: 'Built during Odoo x Amalthea Hackathon, Expenseura streamlines company expense tracking with OCR receipt extraction, multi-level approvals, and multi-currency support.',
+      image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&h=800&fit=crop',
+      videoUrl: null,
+      tech: ['React 18', 'Vite', 'TailwindCSS', 'Supabase', 'PostgreSQL', 'Tesseract.js'],
+      links: {
+        live: null,
+        demo: null,
+        github: 'https://github.com/dhruv2311-dot/Expenseura',
+        figma: null,
+        api: 'https://github.com/dhruv2311-dot/Expenseura/blob/main/Docs/API_DOCUMENTATION.md'
+      },
+      featured: true
+    },
+    {
+      id: 21,
+      title: 'CoreInventory',
+      category: 'Hackathons',
+      description: 'Built during Odoo x Indus Virtual Hackathon, CoreInventory is an inventory operations platform for products, receipts, deliveries, stock movement, and warehouse/location controls.',
+      image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200&h=800&fit=crop',
+      videoUrl: null,
+      tech: ['React', 'Vite', 'Node.js', 'Express', 'Supabase', 'Tailwind CSS', 'React Query', 'Zustand'],
+      links: {
+        live: 'https://coreinventory.vercel.app',
+        demo: 'https://coreinventory.vercel.app',
+        github: 'https://github.com/dhruv2311-dot/CoreInventory',
+        figma: null,
+        api: 'https://coreinventory-api.onrender.com'
+      },
+      featured: true
+    },
+    {
+      id: 22,
+      title: 'ReWear - Sustainable Clothing Exchange Platform',
+      category: 'MERN',
+      description: 'A full-stack MERN clothing exchange marketplace with real-time chat, secure authentication, admin moderation tools, and sustainability-focused swapping workflows.',
+      image: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=1200&h=800&fit=crop',
+      videoUrl: null,
+      tech: ['React 19', 'Node.js', 'Express.js', 'MongoDB', 'Socket.io', 'JWT', 'Cloudinary'],
+      links: {
+        live: 'https://rewear.vercel.app',
+        demo: 'https://rewear.vercel.app',
+        github: 'https://github.com/dhruv2311-dot/ReWear',
+        figma: null,
+        api: 'https://rewear-api.onrender.com/api/health'
+      },
+      featured: true
+    },
+    {
+      id: 23,
+      title: 'StockMaster - Modular Inventory Control',
+      category: 'Hackathons',
+      description: 'Built during Odoo x SPIT Hackathon, StockMaster is a role-aware inventory workspace with realtime stock updates, receipts, deliveries, transfers, adjustments, and audit-ready ledger workflows.',
+      image: 'https://images.unsplash.com/photo-1586528116493-6d31f57f2f84?w=1200&h=800&fit=crop',
+      videoUrl: null,
+      tech: ['Next.js 14', 'React 18', 'Supabase', 'PostgreSQL', 'Tailwind CSS', 'Vitest'],
+      links: {
+        live: 'https://stock-master-phi.vercel.app/',
+        demo: 'https://youtu.be/jW3N5y22LoI?si=loHINSVVbZP197BR',
+        github: 'https://github.com/dhruv2311-dot/Stock_Master',
+        figma: null,
+        api: 'https://documenter.getpostman.com/view/39189509/2sBXigMtds'
+      },
+      featured: true
     }
   ];
 
@@ -991,6 +1055,18 @@ const ProjectModal = ({ project, onClose }) => {
                 Live Demo
               </a>
             )}
+            {project.links.demo && (
+              <a
+                href={project.links.demo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary"
+                style={{ flex: 1, justifyContent: 'center' }}
+              >
+                <FaPlay style={{ marginRight: '0.5rem' }} />
+                Demo Video
+              </a>
+            )}
             {project.links.github && (
               <a
                 href={project.links.github}
@@ -1001,6 +1077,18 @@ const ProjectModal = ({ project, onClose }) => {
               >
                 <FaGithub style={{ marginRight: '0.5rem' }} />
                 View Code
+              </a>
+            )}
+            {project.links.api && (
+              <a
+                href={project.links.api}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary"
+                style={{ flex: 1, justifyContent: 'center' }}
+              >
+                <FaExternalLinkAlt style={{ marginRight: '0.5rem' }} />
+                API Docs
               </a>
             )}
           </div>
