@@ -238,10 +238,10 @@ Contributions, issues, and feature requests are welcome!
 
 ## 👤 Author
 
-**Your Name**
-- Website: [yourportfolio.com](https://dhruvsonagra.me/)
-- GitHub: [@yourusername](https://github.com/dhruv2311-dot)
-- LinkedIn: [Your Name](https://www.linkedin.com/in/dhruv-sonagra-995144321/)
+**Dhruv Sonagra**
+- Website: [dhruvsonagra.me](https://dhruvsonagra.me/)
+- GitHub: [@dhruv2311-dot](https://github.com/dhruv2311-dot)
+- LinkedIn: [Dhruv Sonagra](https://www.linkedin.com/in/dhruv-sonagra-995144321/)
 
 ## ⭐ Show your support
 
