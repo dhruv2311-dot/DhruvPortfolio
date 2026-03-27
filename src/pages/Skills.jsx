@@ -144,6 +144,8 @@ const Skills = () => {
       <Helmet>
         <title>Skills | Dhruv Sonagra</title>
         <meta name="description" content="Explore my technical skills in frontend, backend, databases and tools." />
+        <link rel="canonical" href="https://dhruvsonagra.me/skills" />
+        <meta property="og:url" content="https://dhruvsonagra.me/skills" />
       </Helmet>
 
       <main className="skills-page" style={{ paddingTop: '120px', minHeight: '100vh' }}>

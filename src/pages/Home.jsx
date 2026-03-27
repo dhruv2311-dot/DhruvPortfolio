@@ -205,11 +205,28 @@ const Home = () => {
     { icon: <FaTwitter />, url: 'https://x.com/dhruvvv_23_', label: 'Twitter' }
   ];
 
+  const personStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: 'Dhruv Sonagra',
+    url: 'https://dhruvsonagra.me/',
+    jobTitle: 'Full-Stack Developer',
+    sameAs: [
+      'https://github.com/dhruv2311-dot',
+      'https://www.linkedin.com/in/dhruv-sonagra-995144321/',
+      'https://x.com/dhruvvv_23_'
+    ]
+  };
+
   return (
     <>
       <Helmet>
         <title>Dhruv Sonagra | Full-Stack Developer</title>
         <meta name="description" content="Full-Stack Developer specializing in React, Node.js, and modern web technologies. Building scalable and user-friendly applications." />
+        <link rel="canonical" href="https://dhruvsonagra.me/" />
+        <meta property="og:url" content="https://dhruvsonagra.me/" />
+        <meta property="og:type" content="website" />
+        <script type="application/ld+json">{JSON.stringify(personStructuredData)}</script>
       </Helmet>
 
       <main 

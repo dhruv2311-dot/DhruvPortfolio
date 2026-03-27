@@ -814,6 +814,8 @@ const About = () => {
       <Helmet>
         <title>About | Dhruv Sonagra</title>
         <meta name="description" content="Dhruv Sonagra — Full-Stack Developer passionate about building scalable, elegant web experiences." />
+        <link rel="canonical" href="https://dhruvsonagra.me/about" />
+        <meta property="og:url" content="https://dhruvsonagra.me/about" />
       </Helmet>
 
       <main className="about" style={{ paddingTop: '120px', minHeight: '100vh' }}>

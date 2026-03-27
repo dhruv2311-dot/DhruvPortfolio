@@ -643,6 +643,8 @@ const Projects = () => {
       <Helmet>
         <title>Projects | Dhruv Sonagra</title>
         <meta name="description" content="Explore my portfolio of web development projects, UI/UX designs, and open source contributions." />
+        <link rel="canonical" href="https://dhruvsonagra.me/projects" />
+        <meta property="og:url" content="https://dhruvsonagra.me/projects" />
       </Helmet>
 
       <main className="projects" style={{ paddingTop: '120px' }}>

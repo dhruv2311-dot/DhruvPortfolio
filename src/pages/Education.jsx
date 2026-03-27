@@ -233,6 +233,8 @@ const Education = () => {
       <Helmet>
         <title>Education | Dhruv Sonagra</title>
         <meta name="description" content="Academic background of Dhruv Sonagra — from Computer Science degree to school excellence." />
+        <link rel="canonical" href="https://dhruvsonagra.me/education" />
+        <meta property="og:url" content="https://dhruvsonagra.me/education" />
       </Helmet>
 
       <main className="edu-page">

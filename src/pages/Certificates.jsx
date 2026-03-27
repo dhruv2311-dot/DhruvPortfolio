@@ -270,6 +270,8 @@ const Certificates = () => {
       <Helmet>
         <title>Certificates | Dhruv Sonagra</title>
         <meta name="description" content="View my professional certifications from AWS, Google, Meta, Microsoft, and more." />
+        <link rel="canonical" href="https://dhruvsonagra.me/certificates" />
+        <meta property="og:url" content="https://dhruvsonagra.me/certificates" />
       </Helmet>
 
       <main className="certificates" style={{ paddingTop: '120px' }}>

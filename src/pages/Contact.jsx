@@ -168,6 +168,8 @@ const Contact = () => {
       <Helmet>
         <title>Contact | Dhruv Sonagra</title>
         <meta name="description" content="Get in touch with Dhruv Sonagra for collaborations or opportunities." />
+        <link rel="canonical" href="https://dhruvsonagra.me/contact" />
+        <meta property="og:url" content="https://dhruvsonagra.me/contact" />
       </Helmet>
 
       <main className="ct-page" style={{ paddingTop: '120px', minHeight: '100vh' }}>
