@@ -43,38 +43,35 @@ function ScrollToTop() {
 }
 
 function SnowfallLayer({ snowflakeCount }) {
-  if (snowflakeCount <= 0) {
-    return null;
-  }
+  const [size, setSize] = useState({ w: window.innerWidth, h: window.innerHeight });
+
+  useEffect(() => {
+    const update = () => setSize({ w: window.innerWidth, h: window.innerHeight });
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  if (snowflakeCount <= 0) return null;
 
   return (
-    <div
+    <Snowfall
+      color="#00d4ff"
+      snowflakeCount={snowflakeCount}
+      width={size.w}
+      height={size.h}
       style={{
         position: 'fixed',
-        inset: 0,
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
         zIndex: 1,
-        pointerEvents: 'none',
-        overflow: 'hidden',
-        width: '100vw',
-        height: '100vh'
+        pointerEvents: 'none'
       }}
-    >
-      <Snowfall
-        color="#00d4ff"
-        snowflakeCount={snowflakeCount}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          pointerEvents: 'none'
-        }}
-        radius={[0.4, 2]}
-        speed={[0.8, 2.2]}
-        wind={[-0.3, 0.5]}
-      />
-    </div>
+      radius={[0.4, 2]}
+      speed={[0.8, 2.2]}
+      wind={[-0.3, 0.5]}
+    />
   );
 }
 
