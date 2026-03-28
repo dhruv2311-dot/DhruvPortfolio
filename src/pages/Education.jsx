@@ -237,7 +237,7 @@ const Education = () => {
         <meta property="og:url" content="https://dhruvsonagra.me/education" />
       </Helmet>
 
-      <main className="edu-page">
+      <div className="edu-page">
         <div className="container">
 
           {/* ── Header ──────────────────────────────────── */}
@@ -290,7 +290,7 @@ const Education = () => {
           </div>
 
         </div>
-      </main>
+      </div>
     </>
   );
 };
