@@ -198,7 +198,7 @@ const PageTransition = ({ children }) => {
       <div
         style={{
           width:         '100%',
-          minHeight:     '100vh',
+          minHeight:     'auto',
           opacity:        isActive ? 0 : 1,
           pointerEvents:  isActive ? 'none' : 'auto',
           transition:     isActive ? 'none' : 'opacity 0.3s ease',
