@@ -647,7 +647,7 @@ const Projects = () => {
         <meta property="og:url" content="https://dhruvsonagra.me/projects" />
       </Helmet>
 
-      <main className="projects" style={{ paddingTop: '120px' }}>
+      <div className="projects" style={{ paddingTop: '120px' }}>
         {/* Header */}
         <section className="container" style={{ marginBottom: '4rem' }}>
           <motion.div
@@ -874,7 +874,7 @@ const Projects = () => {
             />
           )}
         </AnimatePresence>
-      </main>
+      </div>
     </>
   );
 };
