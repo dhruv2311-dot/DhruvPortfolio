@@ -229,7 +229,7 @@ const Home = () => {
         <script type="application/ld+json">{JSON.stringify(personStructuredData)}</script>
       </Helmet>
 
-      <main 
+      <div 
         ref={containerRef}
         className="home"
         style={{
@@ -265,13 +265,7 @@ const Home = () => {
         }} />
 
         <div className="container">
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '4rem',
-            alignItems: 'center',
-            minHeight: 'calc(100vh - 200px)'
-          }}>
+          <div className="hero-grid">
             {/* Left Content */}
             <div style={{ maxWidth: '600px' }}>
               {/* Badge */}
@@ -351,7 +345,7 @@ const Home = () => {
               </p>
 
               {/* CTA Buttons with React Spring */}
-              <div ref={buttonsRef} style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+              <div ref={buttonsRef} className="hero-cta-buttons" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
                 <animated.div style={primaryButtonSpring}>
                   <Link 
                     to="/projects" 
@@ -555,7 +549,7 @@ const Home = () => {
         </div>
 
 
-      </main>
+      </div>
     </>
   );
 };
