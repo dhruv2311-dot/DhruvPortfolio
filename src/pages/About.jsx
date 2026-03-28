@@ -151,11 +151,11 @@ const GITHUB_USERNAME = 'dhruv2311-dot';
 const LEETCODE_USERNAME = 'dhruvvv_23';
 const LIVE_REFRESH_MS = 60000;
 const LEETCODE_PROFILE_ENDPOINT = `https://leetcode-api-faisalshohag.vercel.app/${LEETCODE_USERNAME}`;
-const LEETCODE_CONTEST_ENDPOINT = `https://alfa-leetcode-api.onrender.com/userContestRankingInfo/${LEETCODE_USERNAME}`;
+// Contest data fetched via LeetCode's official GraphQL API (see fetchLeetCodeData)
 const GITHUB_CONTRIBUTIONS_HISTORY_ENDPOINT = `https://github-contributions-api.jogruber.de/v4/${GITHUB_USERNAME}`;
 const DEFAULT_LEETCODE_CONTEST = {
-  contestRanking: 414102,
-  contestsAttended: 6
+  contestRanking: 350269,
+  contestsAttended: 8
 };
 const VERIFIED_GITHUB_YEARLY_BASELINE = {
   2026: 393,
@@ -378,15 +378,15 @@ const About = () => {
   });
   const [selectedContributionYear, setSelectedContributionYear] = useState(new Date().getFullYear());
   const [leetcodeData, setLeetcodeData] = useState({
-    totalSolved: 328,
-    totalQuestions: 3873,
-    easySolved: 210,
-    totalEasy: 932,
-    mediumSolved: 103,
-    totalMedium: 2026,
+    totalSolved: 340,
+    totalQuestions: 3879,
+    easySolved: 219,
+    totalEasy: 933,
+    mediumSolved: 106,
+    totalMedium: 2030,
     hardSolved: 15,
-    totalHard: 915,
-    ranking: 387674,
+    totalHard: 916,
+    ranking: 367483,
     contestRanking: DEFAULT_LEETCODE_CONTEST.contestRanking,
     contestsAttended: DEFAULT_LEETCODE_CONTEST.contestsAttended,
     profileUrl: `https://leetcode.com/u/${LEETCODE_USERNAME}/`,
@@ -508,26 +508,26 @@ const About = () => {
     };
 
     const fetchLeetCodeData = async (signal) => {
-      try {
-        let baseData = null;
+      // ── IMPORTANT: declare OUTSIDE try so it's accessible after catch ────────
+      let baseData = null;
 
-        // Using CORS-proxy API instead of direct LeetCode GraphQL to avoid CORS errors
-        const fallbackRes = await fetch(LEETCODE_PROFILE_ENDPOINT, { signal });
-        if (fallbackRes.ok) {
-          const fallbackJson = await fallbackRes.json();
+      try {
+        // Append timestamp to bust Vercel edge cache for real-time syncing
+        const profileUrl = `${LEETCODE_PROFILE_ENDPOINT}?_t=${Date.now()}`;
+        const res = await fetch(profileUrl, { signal });
+        if (res.ok) {
+          const json = await res.json();
           baseData = {
-            totalSolved: toNumberOrNull(fallbackJson?.totalSolved),
-            totalQuestions: toNumberOrNull(fallbackJson?.totalQuestions),
-            easySolved: toNumberOrNull(fallbackJson?.easySolved),
-            totalEasy: toNumberOrNull(fallbackJson?.totalEasy),
-            mediumSolved: toNumberOrNull(fallbackJson?.mediumSolved),
-            totalMedium: toNumberOrNull(fallbackJson?.totalMedium),
-            hardSolved: toNumberOrNull(fallbackJson?.hardSolved),
-            totalHard: toNumberOrNull(fallbackJson?.totalHard),
-            ranking: toNumberOrNull(fallbackJson?.ranking),
-            contestRanking: null,
-            contestsAttended: null,
-            username: `@${LEETCODE_USERNAME}`
+            totalSolved:    toNumberOrNull(json?.totalSolved),
+            totalQuestions: toNumberOrNull(json?.totalQuestions),
+            easySolved:     toNumberOrNull(json?.easySolved),
+            totalEasy:      toNumberOrNull(json?.totalEasy),
+            mediumSolved:   toNumberOrNull(json?.mediumSolved),
+            totalMedium:    toNumberOrNull(json?.totalMedium),
+            hardSolved:     toNumberOrNull(json?.hardSolved),
+            totalHard:      toNumberOrNull(json?.totalHard),
+            ranking:        toNumberOrNull(json?.ranking),
+            username:       `@${LEETCODE_USERNAME}`
           };
         }
       } catch {
@@ -538,40 +538,52 @@ const About = () => {
         return;
       }
 
-      let contestData = {
-        contestRanking: baseData.contestRanking,
-        contestsAttended: baseData.contestsAttended
-      };
+      // ── Fetch contest data via LeetCode's own GraphQL API ─────────────────
+      // (Using GET through allorigins proxy to bypass LeetCode's strict browser CORS)
+      let contestData = { contestRanking: null, contestsAttended: null };
+      try {
+        const query = `query userContestRankingInfo($username: String!) {
+          userContestRanking(username: $username) {
+            attendedContestsCount
+            globalRanking
+          }
+        }`;
+        
+        // Add timestamp to the LeetCode URL to bust proxy cache
+        const leetUrl = `https://leetcode.com/graphql?query=${encodeURIComponent(query)}&variables=${encodeURIComponent(JSON.stringify({ username: LEETCODE_USERNAME }))}&_t=${Date.now()}`;
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(leetUrl)}`;
 
-      if (contestData.contestRanking == null || contestData.contestsAttended == null) {
-        try {
-          const contestRes = await fetch(LEETCODE_CONTEST_ENDPOINT, { signal });
-          if (contestRes.ok) {
-            const contestJson = await contestRes.json();
+        const gqlRes = await fetch(proxyUrl, { signal });
+
+        if (gqlRes.ok) {
+          const gqlJson = await gqlRes.json();
+          const ranking = gqlJson?.data?.userContestRanking;
+          if (ranking) {
             contestData = {
-              contestRanking: toNumberOrNull(contestJson?.data?.userContestRanking?.globalRanking),
-              contestsAttended: toNumberOrNull(contestJson?.data?.userContestRanking?.attendedContestsCount)
+              contestRanking:   toNumberOrNull(ranking.globalRanking),
+              contestsAttended: toNumberOrNull(ranking.attendedContestsCount)
             };
           }
-        } catch {
-          if (signal?.aborted) return;
         }
+      } catch {
+        if (signal?.aborted) return;
+        // GraphQL failed — fall back to stored defaults
       }
 
       setLeetcodeData((prev) => ({
-        totalSolved: baseData.totalSolved ?? prev.totalSolved,
-        totalQuestions: baseData.totalQuestions ?? prev.totalQuestions,
-        easySolved: baseData.easySolved ?? prev.easySolved,
-        totalEasy: baseData.totalEasy ?? prev.totalEasy,
-        mediumSolved: baseData.mediumSolved ?? prev.mediumSolved,
-        totalMedium: baseData.totalMedium ?? prev.totalMedium,
-        hardSolved: baseData.hardSolved ?? prev.hardSolved,
-        totalHard: baseData.totalHard ?? prev.totalHard,
-        ranking: baseData.ranking ?? prev.ranking,
-        contestRanking: contestData.contestRanking ?? prev.contestRanking ?? DEFAULT_LEETCODE_CONTEST.contestRanking,
+        totalSolved:      baseData.totalSolved      ?? prev.totalSolved,
+        totalQuestions:   baseData.totalQuestions   ?? prev.totalQuestions,
+        easySolved:       baseData.easySolved       ?? prev.easySolved,
+        totalEasy:        baseData.totalEasy        ?? prev.totalEasy,
+        mediumSolved:     baseData.mediumSolved     ?? prev.mediumSolved,
+        totalMedium:      baseData.totalMedium      ?? prev.totalMedium,
+        hardSolved:       baseData.hardSolved       ?? prev.hardSolved,
+        totalHard:        baseData.totalHard        ?? prev.totalHard,
+        ranking:          baseData.ranking          ?? prev.ranking,
+        contestRanking:   contestData.contestRanking   ?? prev.contestRanking   ?? DEFAULT_LEETCODE_CONTEST.contestRanking,
         contestsAttended: contestData.contestsAttended ?? prev.contestsAttended ?? DEFAULT_LEETCODE_CONTEST.contestsAttended,
         profileUrl: `https://leetcode.com/u/${LEETCODE_USERNAME}/`,
-        username: baseData.username ?? prev.username
+        username:   baseData.username ?? prev.username
       }));
     };
 
@@ -747,7 +759,7 @@ const About = () => {
         <meta property="og:url" content="https://dhruvsonagra.me/about" />
       </Helmet>
 
-      <main className="about" style={{ paddingTop: '120px', minHeight: '100vh' }}>
+      <article className="about" style={{ paddingTop: '120px' }}>
         <div className="container">
 
           {/* ── Profile Row ───────────────────────────────── */}
@@ -1090,7 +1102,7 @@ const About = () => {
           </section>
 
         </div>
-      </main>
+      </article>
     </>
   );
 };
