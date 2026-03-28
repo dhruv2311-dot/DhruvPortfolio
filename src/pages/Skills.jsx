@@ -148,7 +148,7 @@ const Skills = () => {
         <meta property="og:url" content="https://dhruvsonagra.me/skills" />
       </Helmet>
 
-      <main className="skills-page" style={{ paddingTop: '120px', minHeight: '100vh' }}>
+      <div className="skills-page" style={{ paddingTop: '120px' }}>
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
 
           {/* ── Header ──────────────────────────────────────────── */}
@@ -228,7 +228,7 @@ const Skills = () => {
           </motion.div>
 
         </div>
-      </main>
+      </div>
     </>
   );
 };
