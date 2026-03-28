@@ -253,8 +253,7 @@ const Navigation = () => {
             className="btn btn-primary magnetic"
             style={{ 
               fontSize: '0.875rem',
-              padding: '0.625rem 1.5rem',
-              display: 'none'
+              padding: '0.625rem 1.5rem'
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -268,7 +267,6 @@ const Navigation = () => {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
             style={{
-              display: 'none',
               background: 'none',
               border: 'none',
               cursor: 'pointer',

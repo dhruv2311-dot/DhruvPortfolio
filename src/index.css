@@ -289,7 +289,11 @@ body .app {
 main {
   width: 100%;
   box-sizing: border-box;
-} */
+}
+
+/* ===================================
+   BUTTONS
+   =================================== */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -578,17 +582,36 @@ main {
   }
   
   html, body {
-    width: 100%;
+    width: 100vw;
     overflow-x: hidden;
   }
   
   .container {
     padding: 0 var(--space-4);
     width: 100%;
+    max-width: 100vw;
   }
 }
 
 @media (max-width: 480px) {
+  :root {
+    --text-base: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+    --text-lg: clamp(1rem, 0.9rem + 0.35vw, 1.125rem);
+    --text-xl: clamp(1.125rem, 1rem + 0.35vw, 1.25rem);
+    --text-2xl: clamp(1.25rem, 1rem + 0.75vw, 1.5rem);
+  }
+  
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+  .container {
+    padding: 0 1rem;
+    width: 100%;
+    max-width: 100%;
+  }
+  
   .btn {
     padding: var(--space-2) var(--space-4);
     font-size: var(--text-xs);
