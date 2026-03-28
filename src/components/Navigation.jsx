@@ -151,7 +151,7 @@ const Navigation = () => {
           transition: 'all 0.3s ease'
         }}
       >
-        <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="container nav-inner">
           {/* Logo */}
           <Link to="/" className="nav-logo" style={{ position: 'relative', zIndex: 10 }}>
             <motion.div
@@ -180,15 +180,7 @@ const Navigation = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div 
-            className="desktop-nav"
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.5rem',
-              position: 'relative'
-            }}
-          >
+          <div className="desktop-nav">
             {/* Animated Background Indicator */}
             <motion.div
               ref={indicatorRef}
@@ -252,62 +244,38 @@ const Navigation = () => {
             className="mobile-menu-button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              zIndex: 1001
-            }}
           >
-            <motion.div
-              style={{ width: '24px', height: '20px', position: 'relative' }}
-              animate={isMobileMenuOpen ? 'open' : 'closed'}
-            >
-              <motion.span
-                style={{
-                  position: 'absolute',
-                  width: '100%',
-                  height: '2px',
-                  background: '#fff',
-                  borderRadius: '2px'
-                }}
-                variants={{
-                  closed: { top: '0%', rotate: 0 },
-                  open: { top: '50%', rotate: 45, translateY: '-50%' }
-                }}
-                transition={{ duration: 0.3 }}
-              />
-              <motion.span
-                style={{
-                  position: 'absolute',
-                  width: '100%',
-                  height: '2px',
-                  background: '#fff',
-                  borderRadius: '2px',
-                  top: '50%',
-                  translateY: '-50%'
-                }}
-                variants={{
-                  closed: { opacity: 1 },
-                  open: { opacity: 0 }
-                }}
-                transition={{ duration: 0.3 }}
-              />
-              <motion.span
-                style={{
-                  position: 'absolute',
-                  width: '100%',
-                  height: '2px',
-                  background: '#fff',
-                  borderRadius: '2px'
-                }}
-                variants={{
-                  closed: { bottom: '0%', rotate: 0 },
-                  open: { bottom: '50%', rotate: -45, translateY: '50%' }
-                }}
-                transition={{ duration: 0.3 }}
-              />
-            </motion.div>
+            <div style={{ width: '24px', height: '20px', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <span style={{
+                display: 'block',
+                width: '100%',
+                height: '2px',
+                background: '#fff',
+                borderRadius: '2px',
+                transformOrigin: 'center',
+                transition: 'transform 0.3s ease, opacity 0.3s ease',
+                transform: isMobileMenuOpen ? 'translateY(9px) rotate(45deg)' : 'none'
+              }} />
+              <span style={{
+                display: 'block',
+                width: '100%',
+                height: '2px',
+                background: '#fff',
+                borderRadius: '2px',
+                transition: 'opacity 0.3s ease',
+                opacity: isMobileMenuOpen ? 0 : 1
+              }} />
+              <span style={{
+                display: 'block',
+                width: '100%',
+                height: '2px',
+                background: '#fff',
+                borderRadius: '2px',
+                transformOrigin: 'center',
+                transition: 'transform 0.3s ease, opacity 0.3s ease',
+                transform: isMobileMenuOpen ? 'translateY(-9px) rotate(-45deg)' : 'none'
+              }} />
+            </div>
           </button>
         </div>
       </motion.nav>
