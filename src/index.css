@@ -120,13 +120,13 @@
 
 html {
   font-size: 16px;
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth removed — Lenis handles smooth scrolling */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   width: 100%;
-  height: 100%;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
@@ -277,13 +277,15 @@ a {
 /* App & Layout Containers */
 body #root {
   width: 100%;
-  height: 100%;
+  /* height: 100% removed — caps page height and blocks scroll */
 }
 
 body .app {
-  width: 100vw;
+  width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
+  /* overflow-x: hidden REMOVED — causes browser to make .app a scroll container,
+     intercepting Lenis which hooks into window scroll.
+     html/body overflow-x:hidden already prevents horizontal scroll. */
 }
 
 main {
