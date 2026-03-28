@@ -274,7 +274,7 @@ const Certificates = () => {
         <meta property="og:url" content="https://dhruvsonagra.me/certificates" />
       </Helmet>
 
-      <main className="certificates" style={{ paddingTop: '120px' }}>
+      <div className="certificates" style={{ paddingTop: '120px' }}>
         {/* Header */}
         <section className="container" style={{ marginBottom: '4rem' }}>
           <motion.div
@@ -774,7 +774,7 @@ const Certificates = () => {
             </p>
           </motion.div>
         </section>
-      </main>
+      </div>
     </>
   );
 };
