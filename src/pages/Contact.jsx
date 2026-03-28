@@ -172,7 +172,7 @@ const Contact = () => {
         <meta property="og:url" content="https://dhruvsonagra.me/contact" />
       </Helmet>
 
-      <main className="ct-page" style={{ paddingTop: '120px', minHeight: '100vh' }}>
+      <div className="ct-page" style={{ paddingTop: '120px' }}>
         <div className="container">
 
           {/* ── Header ──────────────────────────────────── */}
@@ -385,7 +385,7 @@ const Contact = () => {
           </motion.div>
 
         </div>
-      </main>
+      </div>
     </>
   );
 };
