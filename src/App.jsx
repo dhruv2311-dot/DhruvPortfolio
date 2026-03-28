@@ -48,26 +48,23 @@ function SnowfallLayer({ snowflakeCount }) {
   }
 
   return (
-    <div
+    <Snowfall
+      color="#00d4ff"
+      snowflakeCount={snowflakeCount}
       style={{
         position: 'fixed',
         top: 0,
         left: 0,
-        width: '100vw',
-        height: '100vh',
+        width: '100%',
+        height: '100%',
         zIndex: 1,
         pointerEvents: 'none',
         overflow: 'hidden'
       }}
-    >
-      <Snowfall
-        color="#00d4ff"
-        snowflakeCount={snowflakeCount}
-        radius={[0.4, 2]}
-        speed={[0.8, 2.2]}
-        wind={[-0.3, 0.5]}
-      />
-    </div>
+      radius={[0.4, 2]}
+      speed={[0.8, 2.2]}
+      wind={[-0.3, 0.5]}
+    />
   );
 }
 

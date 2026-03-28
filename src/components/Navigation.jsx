@@ -247,20 +247,6 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <motion.a
-            href="/contact"
-            className="btn btn-primary magnetic"
-            style={{ 
-              fontSize: '0.875rem',
-              padding: '0.625rem 1.5rem'
-            }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Hire Me
-          </motion.a>
-
           {/* Mobile Menu Button */}
           <button
             className="mobile-menu-button"
@@ -326,68 +312,101 @@ const Navigation = () => {
         </div>
       </motion.nav>
 
-      {/* Mobile Navigation Overlay */}
+      {/* Mobile Navigation Drawer */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div
-            className="mobile-nav-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              background: 'rgba(10, 14, 26, 0.98)',
-              backdropFilter: 'blur(20px)',
-              zIndex: 999,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <motion.nav
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
               style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0, 0, 0, 0.5)',
+                zIndex: 998,
+                backdropFilter: 'blur(4px)'
+              }}
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+
+            {/* Top-Slide Drawer Menu */}
+            <motion.div
+              className="mobile-drawer"
+              initial={{ y: -400, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -400, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 35 }}
+              style={{
+                position: 'fixed',
+                top: 60,
+                left: 0,
+                right: 0,
+                background: 'rgba(10, 14, 26, 0.95)',
+                backdropFilter: 'blur(20px)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                zIndex: 999,
+                padding: '2rem 1.5rem',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '1.5rem',
-                textAlign: 'center'
+                gap: '1rem',
+                maxHeight: 'calc(100vh - 60px)',
+                overflowY: 'auto'
               }}
             >
-              {navLinks.map((link, index) => (
-                <motion.div
-                  key={link.path}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Link
-                    to={link.path}
-                    style={{
-                      fontSize: '2rem',
-                      fontWeight: 600,
-                      color: location.pathname === link.path ? '#00d4ff' : '#fff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '1rem'
-                    }}
-                    onClick={() => setIsMobileMenuOpen(false)}
+              <motion.nav
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.5rem'
+                }}
+              >
+                {navLinks.map((link, index) => (
+                  <motion.div
+                    key={link.path}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ delay: index * 0.08 }}
                   >
-                    <span style={{ 
-                      fontSize: '0.875rem', 
-                      fontFamily: 'var(--font-mono)',
-                      opacity: 0.5 
-                    }}>
-                      {link.icon}
-                    </span>
-                    {link.label}
-                  </Link>
-                </motion.div>
-              ))}
-            </motion.nav>
-          </motion.div>
+                    <Link
+                      to={link.path}
+                      style={{
+                        fontSize: '1.125rem',
+                        fontWeight: 500,
+                        color: location.pathname === link.path ? '#00d4ff' : '#fff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem',
+                        padding: '0.75rem 1rem',
+                        borderRadius: '8px',
+                        transition: 'all 0.3s ease',
+                        backgroundColor: location.pathname === link.path ? 'rgba(0, 212, 255, 0.1)' : 'transparent'
+                      }}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = location.pathname === link.path ? 'rgba(0, 212, 255, 0.1)' : 'transparent';
+                      }}
+                    >
+                      <span style={{ 
+                        fontSize: '1rem', 
+                        fontFamily: 'var(--font-mono)',
+                        opacity: 0.7 
+                      }}>
+                        {link.icon}
+                      </span>
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                ))}
+              </motion.nav>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
