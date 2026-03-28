@@ -150,7 +150,6 @@ const ProgressRow = ({ label, solved, total, color, subtitle }) => {
 const GITHUB_USERNAME = 'dhruv2311-dot';
 const LEETCODE_USERNAME = 'dhruvvv_23';
 const LIVE_REFRESH_MS = 60000;
-const LEETCODE_GRAPHQL_ENDPOINT = 'https://leetcode.com/graphql';
 const LEETCODE_PROFILE_ENDPOINT = `https://leetcode-api-faisalshohag.vercel.app/${LEETCODE_USERNAME}`;
 const LEETCODE_CONTEST_ENDPOINT = `https://alfa-leetcode-api.onrender.com/userContestRankingInfo/${LEETCODE_USERNAME}`;
 const GITHUB_CONTRIBUTIONS_HISTORY_ENDPOINT = `https://github-contributions-api.jogruber.de/v4/${GITHUB_USERNAME}`;
@@ -414,10 +413,6 @@ const About = () => {
 
   useEffect(() => {
     const toNumberOrNull = (value) => (typeof value === 'number' && Number.isFinite(value) ? value : null);
-    const byDifficulty = (list, difficulty, fallback = null) => {
-      const value = list.find((item) => item?.difficulty === difficulty)?.count;
-      return typeof value === 'number' ? value : fallback;
-    };
     let activeController = null;
 
     const fetchGithubData = async (signal) => {
@@ -516,93 +511,27 @@ const About = () => {
       try {
         let baseData = null;
 
-        const query = `
-          query getUserProfile($username: String!) {
-            allQuestionsCount {
-              difficulty
-              count
-            }
-            matchedUser(username: $username) {
-              username
-              profile {
-                ranking
-              }
-              submitStatsGlobal {
-                acSubmissionNum {
-                  difficulty
-                  count
-                }
-              }
-            }
-            userContestRanking(username: $username) {
-              attendedContestsCount
-              globalRanking
-            }
-          }
-        `;
-
-        const profileRes = await fetch(LEETCODE_GRAPHQL_ENDPOINT, {
-          method: 'POST',
-          signal,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query,
-            variables: { username: LEETCODE_USERNAME }
-          })
-        });
-
-        if (!profileRes.ok) throw new Error('LeetCode profile fetch failed');
-
-        const profileJson = await profileRes.json();
-        const data = profileJson?.data;
-        const acSubmissionNum = data?.matchedUser?.submitStatsGlobal?.acSubmissionNum;
-        const allQuestionsCount = data?.allQuestionsCount;
-
-        if (!data?.matchedUser || !Array.isArray(acSubmissionNum) || !Array.isArray(allQuestionsCount)) {
-          throw new Error('LeetCode GraphQL payload invalid');
+        // Using CORS-proxy API instead of direct LeetCode GraphQL to avoid CORS errors
+        const fallbackRes = await fetch(LEETCODE_PROFILE_ENDPOINT, { signal });
+        if (fallbackRes.ok) {
+          const fallbackJson = await fallbackRes.json();
+          baseData = {
+            totalSolved: toNumberOrNull(fallbackJson?.totalSolved),
+            totalQuestions: toNumberOrNull(fallbackJson?.totalQuestions),
+            easySolved: toNumberOrNull(fallbackJson?.easySolved),
+            totalEasy: toNumberOrNull(fallbackJson?.totalEasy),
+            mediumSolved: toNumberOrNull(fallbackJson?.mediumSolved),
+            totalMedium: toNumberOrNull(fallbackJson?.totalMedium),
+            hardSolved: toNumberOrNull(fallbackJson?.hardSolved),
+            totalHard: toNumberOrNull(fallbackJson?.totalHard),
+            ranking: toNumberOrNull(fallbackJson?.ranking),
+            contestRanking: null,
+            contestsAttended: null,
+            username: `@${LEETCODE_USERNAME}`
+          };
         }
-
-        baseData = {
-          totalSolved: byDifficulty(acSubmissionNum, 'All', leetcodeData.totalSolved),
-          totalQuestions: byDifficulty(allQuestionsCount, 'All', leetcodeData.totalQuestions),
-          easySolved: byDifficulty(acSubmissionNum, 'Easy', leetcodeData.easySolved),
-          totalEasy: byDifficulty(allQuestionsCount, 'Easy', leetcodeData.totalEasy),
-          mediumSolved: byDifficulty(acSubmissionNum, 'Medium', leetcodeData.mediumSolved),
-          totalMedium: byDifficulty(allQuestionsCount, 'Medium', leetcodeData.totalMedium),
-          hardSolved: byDifficulty(acSubmissionNum, 'Hard', leetcodeData.hardSolved),
-          totalHard: byDifficulty(allQuestionsCount, 'Hard', leetcodeData.totalHard),
-          ranking: toNumberOrNull(data?.matchedUser?.profile?.ranking),
-          contestRanking: toNumberOrNull(data?.userContestRanking?.globalRanking),
-          contestsAttended: toNumberOrNull(data?.userContestRanking?.attendedContestsCount),
-          username: `@${data?.matchedUser?.username || LEETCODE_USERNAME}`
-        };
       } catch {
         if (signal?.aborted) return;
-      }
-
-      if (!baseData) {
-        try {
-          const fallbackRes = await fetch(LEETCODE_PROFILE_ENDPOINT, { signal });
-          if (fallbackRes.ok) {
-            const fallbackJson = await fallbackRes.json();
-            baseData = {
-              totalSolved: toNumberOrNull(fallbackJson?.totalSolved),
-              totalQuestions: toNumberOrNull(fallbackJson?.totalQuestions),
-              easySolved: toNumberOrNull(fallbackJson?.easySolved),
-              totalEasy: toNumberOrNull(fallbackJson?.totalEasy),
-              mediumSolved: toNumberOrNull(fallbackJson?.mediumSolved),
-              totalMedium: toNumberOrNull(fallbackJson?.totalMedium),
-              hardSolved: toNumberOrNull(fallbackJson?.hardSolved),
-              totalHard: toNumberOrNull(fallbackJson?.totalHard),
-              ranking: toNumberOrNull(fallbackJson?.ranking),
-              contestRanking: null,
-              contestsAttended: null,
-              username: `@${LEETCODE_USERNAME}`
-            };
-          }
-        } catch {
-          if (signal?.aborted) return;
-        }
       }
 
       if (!baseData || !Number.isFinite(baseData.totalSolved) || baseData.totalSolved <= 0) {

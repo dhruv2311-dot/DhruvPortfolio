@@ -335,25 +335,27 @@ const Navigation = () => {
             {/* Top-Slide Drawer Menu */}
             <motion.div
               className="mobile-drawer"
-              initial={{ y: -400, opacity: 0 }}
+              initial={{ y: -300, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -400, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 350, damping: 35 }}
+              exit={{ y: -300, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               style={{
                 position: 'fixed',
                 top: 60,
                 left: 0,
                 right: 0,
-                background: 'rgba(10, 14, 26, 0.95)',
+                width: '100%',
+                background: 'rgba(10, 14, 26, 0.98)',
                 backdropFilter: 'blur(20px)',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
                 zIndex: 999,
-                padding: '2rem 1.5rem',
+                padding: '1.5rem',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '1rem',
-                maxHeight: 'calc(100vh - 60px)',
-                overflowY: 'auto'
+                gap: '0.75rem',
+                maxHeight: 'calc(100vh - 70px)',
+                overflowY: 'auto',
+                boxSizing: 'border-box'
               }}
             >
               <motion.nav
