@@ -49,12 +49,7 @@ const Footer = () => {
     }}>
       <div className="container">
         {/* Main Footer Content */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '2fr 1fr 1fr 1fr',
-          gap: '3rem',
-          marginBottom: '3rem'
-        }}>
+        <div className="footer-grid">
           {/* Brand Column */}
           <div>
             <Link to="/" style={{
@@ -225,13 +220,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingTop: '2rem',
-          borderTop: '1px solid rgba(255, 255, 255, 0.05)'
-        }}>
+        <div className="footer-bottom-bar">
           <p style={{
             fontSize: '0.875rem',
             color: '#64748b',
