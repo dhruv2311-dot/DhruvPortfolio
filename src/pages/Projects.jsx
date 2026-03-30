@@ -626,6 +626,23 @@ const Projects = () => {
         api: 'https://documenter.getpostman.com/view/39189509/2sBXigMtds'
       },
       featured: true
+    },
+    {
+      id: 24,
+      title: 'GlobeTrotter - Full-Stack Travel Planning App',
+      category: 'MERN',
+      description: 'A premium MERN travel planning platform with trip creation, itinerary management, community sharing, admin analytics, and rich travel discovery workflows.',
+      image: 'https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1200&h=800&fit=crop',
+      videoUrl: null,
+      tech: ['React 18', 'Node.js', 'Express 4', 'MongoDB', 'Mongoose', 'Zustand', 'Framer Motion'],
+      links: {
+        live: null,
+        demo: null,
+        github: 'https://github.com/dhruv2311-dot/GlobeTrotter',
+        figma: null,
+        api: 'https://documenter.getpostman.com/view/39189509/2sBXinGAMV'
+      },
+      featured: true
     }
   ];
 
