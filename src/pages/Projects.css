@@ -273,6 +273,35 @@
   overflow-y: auto;
 }
 
+/* Premium Project Card Grid */
+@media (max-width: 1200px) {
+  .projects-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .projects-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+  
+  /* Disable heavy effects on mobile */
+  .spotlight-card {
+    transform: none !important;
+    transition: box-shadow 0.3s ease !important;
+  }
+}
+
+/* Spotlight Card Specific Styles */
+.spotlight-card {
+  will-change: transform, box-shadow, filter;
+}
+
+.spotlight-card:hover {
+  will-change: transform, box-shadow;
+}
+
 .project-modal {
   position: relative;
   max-width: 900px;

@@ -9,6 +9,7 @@ import {
   FaGithub, FaExternalLinkAlt, FaFigma, FaTimes,
   FaPlay, FaVolumeMute, FaVolumeUp
 } from 'react-icons/fa';
+import ProjectCard from '../components/ProjectCard';
 
 // Swiper styles
 import 'swiper/css';
@@ -313,6 +314,7 @@ const VideoProjectCard = ({ project, onSelect }) => {
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedProject, setSelectedProject] = useState(null);
+  const [focusedProjectId, setFocusedProjectId] = useState(null);
 
   const categories = ['All', 'HTML/CSS', 'MERN', 'Figma', 'Hackathons'];
 
@@ -872,10 +874,11 @@ const Projects = () => {
           >
             <AnimatePresence mode="popLayout">
               {filteredProjects.map((project) => (
-                <VideoProjectCard
+                <ProjectCard
                   key={project.id}
                   project={project}
                   onSelect={setSelectedProject}
+                  isFocused={focusedProjectId !== null && focusedProjectId !== project.id}
                 />
               ))}
             </AnimatePresence>
