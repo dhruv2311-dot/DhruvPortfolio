@@ -1,0 +1,98 @@
+/* cursor.css */
+/* 
+   Glow Trail Cursor (Cyber / Neon Style)
+   High-performance completely pure GSAP Particle system mapping.
+*/
+
+@media (min-width: 768px) {
+  body, a, button, [role="button"], input, select, textarea, .project-card, * {
+    cursor: none !important;
+  }
+}
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 99999;
+  /* Additive blending makes colors pop fiercely against dark themes */
+  mix-blend-mode: screen; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 0;
+  height: 0;
+}
+
+/* Base glowing point */
+.neon-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px; 
+  height: 10px;
+  background: #00d4ff; /* Cyber Cyan */
+  border-radius: 50%;
+  /* Fix native alignment securely to exact mouse center */
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px 2px rgba(0, 212, 255, 0.8),
+              0 0 25px 8px rgba(0, 212, 255, 0.4);
+  will-change: transform, background, box-shadow;
+  /* Base transitions handled exclusively natively by JS, no CSS transforms! */
+}
+
+/* Individual trailing instances */
+.neon-trail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px; /* Slightly smaller base than dot */
+  height: 8px;
+  background: #00d4ff;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  mix-blend-mode: screen;
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+  will-change: transform;
+}
+
+/* High-speed Particle System Spawns */
+.neon-particle {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 5px; 
+  height: 5px;
+  background: #ff3366; /* Glowing Magenta Sparks! */
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99997;
+  mix-blend-mode: screen;
+  box-shadow: 0 0 8px rgba(255, 51, 102, 0.9);
+  will-change: transform, opacity;
+}
+
+/* HUD Data Holographic Projection Text */
+.neon-text {
+  position: absolute;
+  top: -30px; /* Float exactly above the pinpoint cursor */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 800;
+  color: #fff;
+  /* Heavy glowing text mimicking neon tubes */
+  text-shadow: 0 0 5px #ff3366, 0 0 10px #ff3366, 0 0 20px #ff3366;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  mix-blend-mode: normal; /* Forces it to remain white and legible */
+}
+
+.custom-cursor.is-hovering .neon-text {
+  opacity: 1;
+}

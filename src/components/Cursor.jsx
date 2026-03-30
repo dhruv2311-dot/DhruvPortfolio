@@ -1,319 +1,274 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
+import './cursor.css';
 
-/**
- * Advanced Custom Cursor with Trail Effect
- * Context-aware cursor that changes based on hoverable elements
- */
+// 🚀 Performance Constants
+const TRAIL_COUNT = 15;   // Length of neon snake tail
+const PARTICLE_COUNT = 40; // Max concurrent sparks (Object Pool limits GC lag)
+
 const Cursor = () => {
-  const cursorDot = useRef(null);
-  const cursorOutline = useRef(null);
-  const [cursorText, setCursorText] = useState('');
-  const [isVisible, setIsVisible] = useState(false);
+  const cursorRef = useRef(null);
+  const dotRef = useRef(null);
+  const textRef = useRef(null);
+  
+  // Object Arrays mapped to DOM nodes
+  const trailRefs = useRef([]);
+  const particleRefs = useRef([]);
+  
+  const location = useLocation();
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Core Physics caching
   const mousePos = useRef({ x: 0, y: 0 });
-  const isTouch = useRef(false);
-  const isHoveringRef = useRef(false);
-  const isVisibleRef = useRef(false);
-  const lowPerformanceMode = useMemo(() => {
-    if (typeof window === 'undefined') return false;
-    const lowCpu = (navigator.hardwareConcurrency || 8) <= 6;
-    const mobileLikeScreen = window.innerWidth < 1024;
-    return lowCpu || mobileLikeScreen;
+  const lastEmitPos = useRef({ x: 0, y: 0 }); // Tracks distance for particle emissions
+  const isHovering = useRef(false);
+  const isVisible = useRef(false);
+  
+  // Pool indices tracker
+  const particleIndex = useRef(0);
+
+  useEffect(() => {
+    // Falls back to native entirely on Mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   useEffect(() => {
-    // Check for touch device
-    isTouch.current = window.matchMedia('(pointer: coarse)').matches;
-    if (isTouch.current) return;
+    if (isMobile) return;
 
-    const dot = cursorDot.current;
-    const outline = cursorOutline.current;
-    if (!dot || !outline) return;
+    // Start completely hidden securely
+    gsap.set(cursorRef.current, { opacity: 0 });
 
-    let rafId;
-    let magneticRafId = null;
-    let trailElements = [];
-    let magneticElements = [];
-
-    const updateMagneticElements = () => {
-      magneticElements = Array.from(document.querySelectorAll('.magnetic'));
-    };
-
-    // Create trail elements only for higher-performance devices.
-    if (!lowPerformanceMode) {
-      for (let i = 0; i < 5; i++) {
-        const trail = document.createElement('div');
-        trail.className = 'cursor-trail';
-        trail.style.cssText = `
-          position: fixed;
-          width: ${8 - i}px;
-          height: ${8 - i}px;
-          background: rgba(0, 212, 255, ${0.3 - i * 0.05});
-          border-radius: 50%;
-          pointer-events: none;
-          z-index: 9998;
-          transform: translate(-50%, -50%);
-          will-change: transform;
-        `;
-        document.body.appendChild(trail);
-        trailElements.push({ el: trail, x: 0, y: 0 });
-      }
-    }
-
-    const dotX = gsap.quickTo(dot, 'x', { duration: 0.08, ease: 'power2.out' });
-    const dotY = gsap.quickTo(dot, 'y', { duration: 0.08, ease: 'power2.out' });
-    const outlineX = gsap.quickTo(outline, 'x', { duration: 0.14, ease: 'power2.out' });
-    const outlineY = gsap.quickTo(outline, 'y', { duration: 0.14, ease: 'power2.out' });
-    const trailSetters = trailElements.map((trail) => ({
-      x: gsap.quickSetter(trail.el, 'x'),
-      y: gsap.quickSetter(trail.el, 'y')
+    // Initialize the Snake Trail arrays natively
+    const trailPositions = Array.from({ length: TRAIL_COUNT }, () => ({ x: 0, y: 0 }));
+    
+    // QuickSetters -> Unlocks real 144hz capabilities bypassing React's event loop
+    const xSet = gsap.quickSetter(cursorRef.current, "x", "px");
+    const ySet = gsap.quickSetter(cursorRef.current, "y", "px");
+    
+    // Massive array of individual trail setters for extremely fast interpolation
+    const trailSetters = trailRefs.current.map((el) => ({
+      x: gsap.quickSetter(el, "x", "px"),
+      y: gsap.quickSetter(el, "y", "px")
     }));
 
-    updateMagneticElements();
+    // Visually scale down each node naturally into a disappearing tail securely 
+    trailRefs.current.forEach((el, i) => {
+       gsap.set(el, { 
+         scale: 1 - (i / TRAIL_COUNT), // Linearly shrinks to 0
+         opacity: 1 - (i / TRAIL_COUNT)
+       });
+    });
+
+    let rafId;
+
+    // The Master Display Loop (144fps+)
+    const render = () => {
+      // 1. Instantly pin the Head (Dot) to Mouse position directly 
+      // Dot doesn't lerp for perfect accuracy!
+      xSet(mousePos.current.x);
+      ySet(mousePos.current.y);
+
+      // 2. Head of trail chases the exact mouse
+      trailPositions[0].x += (mousePos.current.x - trailPositions[0].x) * 0.4;
+      trailPositions[0].y += (mousePos.current.y - trailPositions[0].y) * 0.4;
+      trailSetters[0].x(trailPositions[0].x);
+      trailSetters[0].y(trailPositions[0].y);
+
+      // 3. Each subsequent tail node chases the node directly in front of it! Perfect Snake Physics.
+      for (let i = 1; i < TRAIL_COUNT; i++) {
+        trailPositions[i].x += (trailPositions[i-1].x - trailPositions[i].x) * 0.4;
+        trailPositions[i].y += (trailPositions[i-1].y - trailPositions[i].y) * 0.4;
+        trailSetters[i].x(trailPositions[i].x);
+        trailSetters[i].y(trailPositions[i].y);
+      }
+      
+      // 💥 4. Continuous Particle Emission checking 
+      const delta = Math.hypot(
+        mousePos.current.x - lastEmitPos.current.x, 
+        mousePos.current.y - lastEmitPos.current.y
+      );
+      
+      // Emit a sparkling particle physically every 25px traveled over the screen
+      if (delta > 25) {
+         lastEmitPos.current.x = mousePos.current.x;
+         lastEmitPos.current.y = mousePos.current.y;
+         
+         // Pull node out of the Object Pool
+         const particle = particleRefs.current[particleIndex.current];
+         particleIndex.current = (particleIndex.current + 1) % PARTICLE_COUNT;
+         
+         // Spray them physically opposite to the movement
+         const angle = Math.random() * Math.PI * 2;
+         const distance = Math.random() * 25 + 5; 
+         const endX = mousePos.current.x + Math.cos(angle) * distance;
+         const endY = mousePos.current.y + Math.sin(angle) * distance;
+         
+         gsap.fromTo(particle, 
+           { x: mousePos.current.x, y: mousePos.current.y, scale: Math.random() * 1.5 + 0.5, opacity: 1 },
+           { x: endX, y: endY, scale: 0, opacity: 0, duration: Math.random() * 0.5 + 0.3, ease: "power2.out", overwrite: true }
+         );
+      }
+      
+      rafId = requestAnimationFrame(render);
+    };
+    rafId = requestAnimationFrame(render);
 
     const onMouseMove = (e) => {
-      mousePos.current = { x: e.clientX, y: e.clientY };
+      mousePos.current.x = e.clientX;
+      mousePos.current.y = e.clientY;
       
-      if (!isVisibleRef.current) {
-        isVisibleRef.current = true;
-        setIsVisible(true);
-      }
-
-      dotX(e.clientX);
-      dotY(e.clientY);
-      outlineX(e.clientX);
-      outlineY(e.clientY);
-
-      if (!lowPerformanceMode && !magneticRafId) {
-        magneticRafId = requestAnimationFrame(() => {
-          magneticElements.forEach((el) => {
-            const rect = el.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            const distanceX = mousePos.current.x - centerX;
-            const distanceY = mousePos.current.y - centerY;
-            const distance = Math.hypot(distanceX, distanceY);
-            const maxDistance = 100;
-
-            if (distance < maxDistance) {
-              const strength = (maxDistance - distance) / maxDistance;
-              gsap.to(el, {
-                x: distanceX * strength * 0.3,
-                y: distanceY * strength * 0.3,
-                duration: 0.2,
-                ease: 'power2.out',
-                overwrite: 'auto'
-              });
-            } else {
-              gsap.to(el, {
-                x: 0,
-                y: 0,
-                duration: 0.2,
-                ease: 'power2.out',
-                overwrite: 'auto'
-              });
-            }
-          });
-          magneticRafId = null;
-        });
+      if (!isVisible.current) {
+         gsap.to(cursorRef.current, { opacity: 1, duration: 0.3 });
+         // Automatically fades in trailing elements too
+         trailRefs.current.forEach(el => gsap.to(el, { opacity: "+=0" })); 
+         isVisible.current = true;
       }
     };
 
-    const onMouseEnter = () => {
-      if (!isVisibleRef.current) {
-        isVisibleRef.current = true;
-        setIsVisible(true);
-      }
-    };
-
-    const onMouseLeave = () => {
-      isVisibleRef.current = false;
-      setIsVisible(false);
-    };
-
-    const onWindowMouseLeave = () => {
-      onMouseLeave();
-      resetMagneticElements();
-    };
-
-    // Trail animation loop using simple interpolation (lighter than creating GSAP tweens per frame)
-    const animateTrail = () => {
-      if (lowPerformanceMode || trailElements.length === 0) {
-        rafId = requestAnimationFrame(animateTrail);
-        return;
-      }
-
-      let targetX = mousePos.current.x;
-      let targetY = mousePos.current.y;
-
-      trailElements.forEach((trail, index) => {
-        const lerp = Math.max(0.08, 0.22 - index * 0.03);
-        trail.x += (targetX - trail.x) * lerp;
-        trail.y += (targetY - trail.y) * lerp;
-
-        trailSetters[index].x(trail.x);
-        trailSetters[index].y(trail.y);
-
-        targetX = trail.x;
-        targetY = trail.y;
-      });
-      rafId = requestAnimationFrame(animateTrail);
-    };
-
-    // Use delegated hover listeners to avoid attaching handlers to every element repeatedly.
-    const hoverSelector = 'a, button, [role="button"], input, textarea, select, .hoverable, [data-cursor]';
-
+    // Glow Transitions & Target Interactions 
+    const hoverSelector = 'a, button, [role="button"], input, textarea, select, .project-card, [data-cursor]';
+    
     const onPointerOver = (e) => {
       const el = e.target.closest?.(hoverSelector);
       if (!el) return;
-
-      isHoveringRef.current = true;
-      setCursorText(el.getAttribute('data-cursor') || '');
-
-      gsap.to(outline, {
-        scale: 1.5,
-        borderColor: '#8b5cf6',
-        duration: 0.2,
-        overwrite: 'auto'
+      
+      isHovering.current = true;
+      cursorRef.current.classList.add('is-hovering'); 
+      
+      // Pulse completely to Magenta / Neon Pink
+      gsap.to(dotRef.current, { 
+        backgroundColor: '#ff3366', 
+        boxShadow: '0 0 15px 3px rgba(255, 51, 102, 0.8), 0 0 30px 8px rgba(255, 51, 102, 0.4)', 
+        scale: 2.5, 
+        duration: 0.3 
       });
-      gsap.to(dot, {
-        scale: 0.5,
-        duration: 0.2,
-        overwrite: 'auto'
-      });
+      trailRefs.current.forEach(node => gsap.to(node, { backgroundColor: '#ff3366', duration: 0.3 }));
+
+      // Holographic Neon Text updates
+      if (el.closest('.project-card')) {
+         textRef.current.innerText = 'DATA_SYNC';
+      } else if (el.tagName.toLowerCase() === 'a') {
+         textRef.current.innerText = 'UPLINK';
+      } else if (el.tagName.toLowerCase() === 'button' || el.getAttribute('role') === 'button') {
+         textRef.current.innerText = 'RUN_PROG';
+      } else {
+         textRef.current.innerText = 'ACTIVE';
+      }
     };
 
     const onPointerOut = (e) => {
       const el = e.target.closest?.(hoverSelector);
       if (!el) return;
-      if (e.relatedTarget && el.contains(e.relatedTarget)) return;
-
-      isHoveringRef.current = false;
-      setCursorText('');
-
-      gsap.to(outline, {
-        scale: 1,
-        borderColor: 'rgba(0, 212, 255, 0.5)',
-        duration: 0.2,
-        overwrite: 'auto'
+      
+      isHovering.current = false;
+      cursorRef.current.classList.remove('is-hovering');
+      
+      // Restoring Neon Cyan colors!
+      gsap.to(dotRef.current, { 
+        backgroundColor: '#00d4ff', 
+        boxShadow: '0 0 10px 2px rgba(0, 212, 255, 0.8), 0 0 25px 8px rgba(0, 212, 255, 0.4)', 
+        scale: 1, 
+        duration: 0.3 
       });
-      gsap.to(dot, {
-        scale: 1,
-        duration: 0.2,
-        overwrite: 'auto'
-      });
+      trailRefs.current.forEach(node => gsap.to(node, { backgroundColor: '#00d4ff', duration: 0.3 }));
     };
 
-    // Click effects
     const onMouseDown = () => {
-      gsap.to(dot, { scale: 0.8, duration: 0.1 });
-      gsap.to(outline, { scale: 0.9, duration: 0.1 });
+      cursorRef.current.classList.add('is-clicking');
+      
+      // Explosive click particle burst!! Extracts 15 nodes exactly!
+      for(let i=0; i < 15; i++) {
+        const particle = particleRefs.current[particleIndex.current];
+        particleIndex.current = (particleIndex.current + 1) % PARTICLE_COUNT;
+        
+        // Massive expanding angle 
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.random() * 80 + 20; 
+        const endX = mousePos.current.x + Math.cos(angle) * distance;
+        const endY = mousePos.current.y + Math.sin(angle) * distance;
+
+        gsap.fromTo(particle, 
+          { x: mousePos.current.x, y: mousePos.current.y, scale: Math.random() * 2 + 1, opacity: 1 },
+          { x: endX, y: endY, scale: 0, opacity: 0, duration: Math.random() * 0.6 + 0.4, ease: "power3.out", overwrite: true }
+        );
+      }
     };
 
     const onMouseUp = () => {
-      const hovering = isHoveringRef.current;
-      gsap.to(dot, { scale: hovering ? 0.5 : 1, duration: 0.1 });
-      gsap.to(outline, { scale: hovering ? 1.5 : 1, duration: 0.1 });
+      cursorRef.current.classList.remove('is-clicking');
+    };
+    
+    // Ghost entirely off screen
+    const onMouseLeaveDoc = () => {
+       gsap.to(cursorRef.current, { opacity: 0, duration: 0.3 });
+       isVisible.current = false;
     };
 
-    const resetMagneticElements = () => {
-      magneticElements.forEach((el) => {
-        gsap.to(el, {
-          x: 0,
-          y: 0,
-          duration: 0.2,
-          ease: 'power2.out',
-          overwrite: 'auto'
-        });
-      });
-    };
-
+    // Register all native handling
     window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseenter', onMouseEnter);
-    window.addEventListener('mouseleave', onWindowMouseLeave);
-    window.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mouseup', onMouseUp);
     document.addEventListener('mouseover', onPointerOver, true);
     document.addEventListener('mouseout', onPointerOut, true);
-
-    // Keep magnetic target list in sync with dynamic DOM updates.
-    const observer = new MutationObserver(updateMagneticElements);
-    if (!lowPerformanceMode) {
-      observer.observe(document.body, { childList: true, subtree: true });
-    }
-
-    animateTrail();
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mouseleave', onMouseLeaveDoc);
+    
+    // Kickstart securely matching hardware correctly avoiding jump artifacts
+    const setInitPosition = (e) => {
+      mousePos.current = { x: e.clientX, y: e.clientY };
+      trailPositions.forEach(p => { p.x = e.clientX; p.y = e.clientY; });
+      window.removeEventListener('mousemove', setInitPosition);
+    };
+    window.addEventListener('mousemove', setInitPosition);
 
     return () => {
+      // Clean everything securely
       window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseenter', onMouseEnter);
-      window.removeEventListener('mouseleave', onWindowMouseLeave);
-      window.removeEventListener('mousedown', onMouseDown);
-      window.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('mouseover', onPointerOver, true);
       document.removeEventListener('mouseout', onPointerOut, true);
+      window.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('mouseleave', onMouseLeaveDoc);
+      window.removeEventListener('mousemove', setInitPosition);
       cancelAnimationFrame(rafId);
-      if (magneticRafId) cancelAnimationFrame(magneticRafId);
-      if (!lowPerformanceMode) observer.disconnect();
-      
-      // Clean up trail elements
-      trailElements.forEach(trail => trail.el.remove());
     };
-  }, [lowPerformanceMode]);
+  }, [isMobile, location.pathname]); 
 
-  // Don't render on touch devices
-  if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {
-    return null;
-  }
+  // Hard skips loading any DOM on pure mobile displays saving memory perfectly!
+  if (isMobile) return null;
 
   return (
     <>
-      <div
-        ref={cursorDot}
-        className="cursor-dot"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '8px',
-          height: '8px',
-          background: '#00d4ff',
-          borderRadius: '50%',
-          pointerEvents: 'none',
-          zIndex: 9999,
-          transform: 'translate(-50%, -50%)',
-          opacity: isVisible ? 1 : 0,
-          transition: 'opacity 0.3s',
-          mixBlendMode: 'difference'
-        }}
-      />
-      <div
-        ref={cursorOutline}
-        className="cursor-outline"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: cursorText ? '80px' : '40px',
-          height: cursorText ? '80px' : '40px',
-          border: '1px solid rgba(0, 212, 255, 0.5)',
-          borderRadius: '50%',
-          pointerEvents: 'none',
-          zIndex: 9998,
-          transform: 'translate(-50%, -50%)',
-          opacity: isVisible ? 1 : 0,
-          transition: 'opacity 0.3s, width 0.2s, height 0.2s',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '10px',
-          fontWeight: 600,
-          color: '#00d4ff',
-          textTransform: 'uppercase',
-          letterSpacing: '1px'
-        }}
-      >
-        {cursorText}
+      {/* 1. Dynamic Object Pool array handling continuous high performance emissions securely! */}
+      {Array.from({ length: PARTICLE_COUNT }).map((_, i) => (
+         <div 
+           key={`spark-${i}`} 
+           ref={(el) => (particleRefs.current[i] = el)} 
+           className="neon-particle"
+           style={{ opacity: 0, transform: 'translate(-50%, -50%)' }}
+         ></div>
+      ))}
+
+      {/* 2. Glow Snake Trailer instances physically drawn securely behind main cursor! */}
+      {Array.from({ length: TRAIL_COUNT }).map((_, i) => (
+         <div 
+           key={`node-${i}`} 
+           ref={(el) => (trailRefs.current[i] = el)} 
+           className="neon-trail"
+           style={{ transform: 'translate(-50%, -50%)' }}
+         ></div>
+      ))}
+
+      {/* 3. The Core Pinpoint Hardware dot tracking natively! */}
+      <div ref={cursorRef} className="custom-cursor">
+        <div ref={dotRef} className="neon-dot"></div>
+        {/* Holographic Glowing Typeface strictly appending properly aligned! */}
+        <span ref={textRef} className="neon-text"></span>
       </div>
     </>
   );
