@@ -197,7 +197,7 @@ const Footer = () => {
                     transition: 'color 0.3s ease'
                   }}
                 >
-                  dhruv.sonagra@example.com
+                  dhruv.sonagra.cg@gmail.com
                 </a>
               </li>
               <li>
@@ -209,11 +209,11 @@ const Footer = () => {
                     transition: 'color 0.3s ease'
                   }}
                 >
-                  +91 98765 43210
+                  +91 88492 77382
                 </a>
               </li>
               <li style={{ color: '#64748b', fontSize: '0.875rem' }}>
-                Mumbai, India
+                Ahmedabad, India
               </li>
             </ul>
           </div>
