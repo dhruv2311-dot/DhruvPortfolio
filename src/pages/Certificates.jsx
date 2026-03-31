@@ -323,11 +323,7 @@ const Certificates = () => {
 
         {/* Stats */}
         <section className="container" style={{ marginBottom: '4rem' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '1.5rem'
-          }}>
+          <div className="stats-grid">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -335,25 +331,12 @@ const Certificates = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                style={{
-                  padding: '1.5rem',
-                  background: 'linear-gradient(145deg, rgba(20, 29, 51, 0.6) 0%, rgba(10, 14, 26, 0.8) 100%)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  borderRadius: '1rem',
-                  textAlign: 'center'
-                }}
+                className="stat-card"
               >
-                <div style={{
-                  fontSize: '2rem',
-                  fontWeight: 700,
-                  background: 'linear-gradient(90deg, #f43f5e, #8b5cf6)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  marginBottom: '0.5rem'
-                }}>
+                <div className="stat-value">
                   {stat.value}
                 </div>
-                <div style={{ fontSize: '0.875rem', color: '#64748b' }}>
+                <div className="stat-label">
                   {stat.label}
                 </div>
               </motion.div>
