@@ -114,12 +114,17 @@ function App() {
     }
   }, [isLoading]);
 
-  if (isLoading) {
-    return <Loader onLoadComplete={() => setIsLoading(false)} />;
-  }
-
   return (
-    <HelmetProvider>
+    <>
+      {isLoading && <Loader onLoadComplete={() => setIsLoading(false)} />}
+      <div 
+        style={{ 
+          pointerEvents: isLoading ? 'none' : 'auto',
+          height: isLoading ? '100vh' : 'auto',
+          overflow: isLoading ? 'hidden' : 'visible'
+        }}
+      >
+        <HelmetProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <ScrollToTop />
         
@@ -155,7 +160,9 @@ function App() {
           <Footer />
         </div>
       </Router>
-    </HelmetProvider>
+        </HelmetProvider>
+      </div>
+    </>
   );
 }
 
