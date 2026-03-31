@@ -16,6 +16,7 @@ import Cursor from './components/Cursor';
 import ScrollProgress from './components/ScrollProgress';
 import PageTransition from './components/PageTransition';
 import useSmoothScroll from './hooks/useSmoothScroll';
+import Loader from './components/Loader';
 
 // Pages
 import Home from './pages/Home';
@@ -99,15 +100,8 @@ function App() {
     return 70;
   }, [shouldReduceMotion]);
 
-  // Initial loading animation
-  useEffect(() => {
-    // Simulate loading time for assets
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
+  // Initial loading animation is handled by Loader component calling setIsLoading(false)
+  // when its GSAP animation timeline completes.
 
   // Refresh ScrollTrigger after loading
   useEffect(() => {
@@ -121,51 +115,7 @@ function App() {
   }, [isLoading]);
 
   if (isLoading) {
-    return (
-      <div style={{
-        position: 'fixed',
-        inset: 0,
-        background: '#0a0e1a',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{
-              fontSize: '2rem',
-              fontWeight: 700,
-              background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              marginBottom: '1.5rem'
-            }}
-          >
-            Dhruv Sonagra
-          </motion.div>
-          <div style={{
-            width: '200px',
-            height: '3px',
-            background: 'rgba(255,255,255,0.1)',
-            borderRadius: '3px',
-            overflow: 'hidden'
-          }}>
-            <motion.div
-              style={{
-                height: '100%',
-                background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)'
-              }}
-              initial={{ width: '0%' }}
-              animate={{ width: '100%' }}
-              transition={{ duration: 1.2, ease: 'easeInOut' }}
-            />
-          </div>
-        </div>
-      </div>
-    );
+    return <Loader onLoadComplete={() => setIsLoading(false)} />;
   }
 
   return (

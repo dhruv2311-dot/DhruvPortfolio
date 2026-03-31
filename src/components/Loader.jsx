@@ -1,129 +1,126 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
 import './Loader.css';
 
 /**
- * Loading Screen Component
- * Professional animated loader with CSS-driven orbital animation
+ * Ultra-Premium Morphing Ambient Blob + Mask Reveal Preloader
  */
 const Loader = ({ onLoadComplete }) => {
-  const [progress, setProgress] = useState(0);
+  const containerRef = useRef(null);
+  const nameRef = useRef(null);
+  const subtitleRef = useRef(null);
+  const progressRef = useRef(null);
+  const progressBarRef = useRef(null);
+  
+  const [progressCounter, setProgressCounter] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            onLoadComplete();
-          }, 500);
-          return 100;
+    // 1. Wrap name characters for overflow-hidden smooth reveal
+    const nameText = nameRef.current.innerText;
+    nameRef.current.innerHTML = nameText
+      .split('')
+      .map(char => {
+        if (char === ' ') {
+          return `<span class="char-wrap" style="display:inline-block; overflow:hidden; vertical-align: top;"><span class="char" style="display:inline-block;">&nbsp;</span></span>`;
         }
-        return prev + Math.floor(Math.random() * 8) + 3;
-      });
-    }, 120);
+        return `<span class="char-wrap" style="display:inline-block; overflow:hidden; vertical-align: top;"><span class="char" style="display:inline-block;">${char}</span></span>`;
+      })
+      .join('');
 
-    return () => clearInterval(interval);
+    const chars = nameRef.current.querySelectorAll('.char');
+
+    // 2. Control entire loader timeline
+    const tl = gsap.timeline({
+      onComplete: () => {
+        // Grand Exit: Loader slides up to beautifully unveil the website under it
+        gsap.to(containerRef.current, {
+          yPercent: -100,
+          ease: "expo.inOut",
+          duration: 1.2,
+          onComplete: () => {
+            onLoadComplete();
+          }
+        });
+      }
+    });
+
+    // Reset properties for smooth from-to behavior
+    gsap.set(chars, { yPercent: 100 });
+    gsap.set(subtitleRef.current, { opacity: 0, y: 15 });
+    gsap.set(progressBarRef.current, { scaleX: 0, transformOrigin: "left center" });
+    gsap.set(progressRef.current, { opacity: 0 });
+
+    // Stagger slide-up reveal of the Name Characters (Mask Reveal)
+    tl.to(chars, {
+      yPercent: 0,
+      stagger: 0.04,
+      duration: 1.0,
+      ease: "power4.out"
+    })
+    // Subtitle fade in sleekly
+    .to(subtitleRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      ease: "power2.out"
+    }, "-=0.6")
+    // Fade in numeric counter
+    .to(progressRef.current, {
+      opacity: 1,
+      duration: 0.4,
+      ease: "power2.out"
+    }, "-=0.4")
+    // Sleek progress bar filling & GSAP tracking the value for React State
+    .to({ value: 0 }, {
+      value: 100,
+      duration: 1.8,
+      ease: "power2.inOut",
+      onUpdate: function() {
+        const val = Math.round(this.targets()[0].value);
+        setProgressCounter(val);
+        gsap.set(progressBarRef.current, { scaleX: val / 100 });
+      }
+    }, "-=0.2")
+    // Short dramatic hold at 100%
+    .to({}, { duration: 0.4 })
+    // Fade all texts/bars out cleanly right before sliding
+    .to([nameRef.current, subtitleRef.current, progressRef.current, progressBarRef.current], {
+      opacity: 0,
+      y: -20,
+      duration: 0.6,
+      stagger: 0.05,
+      ease: "power2.inOut"
+    });
+
+    return () => {
+      tl.kill();
+    };
   }, [onLoadComplete]);
 
   return (
-    <motion.div
-      className="loader-container"
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.6 }}
-    >
-      <div className="loader-content">
-        {/* Orbital Animation */}
-        <motion.div
-          className="loader-orbital-wrap"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.6, ease: 'backOut' }}
-        >
-          <div className="loader-orbital">
-            <div className="loader-orbital-ring loader-ring-1"></div>
-            <div className="loader-orbital-ring loader-ring-2"></div>
-            <div className="loader-orbital-ring loader-ring-3"></div>
-            <div className="loader-orbital-core">
-              <span>DS</span>
-            </div>
-          </div>
-        </motion.div>
+    <div className="premium-loader" ref={containerRef}>
+      {/* Elegantly placed ambient background glowing orbs */}
+      <div className="ambient-blob ambient-blob-1"></div>
+      <div className="ambient-blob ambient-blob-2"></div>
 
-        {/* Name */}
-        <motion.h2
-          className="loader-text"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          style={{
-            background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            fontSize: '1.5rem',
-            fontWeight: 700,
-            marginBottom: '0.5rem'
-          }}
-        >
-          Dhruv Sonagra
-        </motion.h2>
-
-        {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          style={{
-            color: '#64748b',
-            fontSize: '0.9rem',
-            marginBottom: '2rem',
-            letterSpacing: '2px',
-            textTransform: 'uppercase'
-          }}
-        >
-          Loading Portfolio
-        </motion.p>
-
-        {/* Progress Bar */}
-        <div style={{
-          width: '280px',
-          height: '3px',
-          background: 'rgba(255, 255, 255, 0.08)',
-          borderRadius: '999px',
-          overflow: 'hidden',
-          margin: '0 auto 1rem'
-        }}>
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${Math.min(progress, 100)}%` }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
-            style={{
-              height: '100%',
-              background: 'linear-gradient(90deg, #00d4ff, #8b5cf6)',
-              boxShadow: '0 0 15px rgba(0, 212, 255, 0.6)',
-              borderRadius: '999px'
-            }}
-          />
-        </div>
-
-        {/* Percentage */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          style={{
-            color: '#00d4ff',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            fontFamily: 'monospace'
-          }}
-        >
-          {Math.min(progress, 100)}%
-        </motion.p>
+      <div className="loader-center">
+        <h1 className="loader-title" ref={nameRef}>DHRUV SONAGRA</h1>
+        <p className="loader-sub" ref={subtitleRef}>Crafting Digital Experiences</p>
       </div>
-    </motion.div>
+
+      <div className="loader-footer">
+        <div className="progress-container">
+          <div className="progress-bar-bg">
+            <div className="progress-bar-fill" ref={progressBarRef}></div>
+          </div>
+          <div className="progress-text" ref={progressRef}>
+            {progressCounter.toString().padStart(3, '0')}%
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
 export default Loader;
+
