@@ -222,7 +222,7 @@ const Home = () => {
     <>
       <Helmet>
         <title>Dhruv Sonagra | Full-Stack Developer</title>
-        <meta name="description" content="Full-Stack Developer specializing in React, Node.js, and modern web technologies. Building scalable and user-friendly applications." />
+        <meta name="description" content="Dhruv Sonagra is a Full-Stack Developer building modern, responsive web apps with React, Node.js, and creative UI/UX. Explore projects, skills, and contact." />
         <link rel="canonical" href="https://dhruvsonagra.me/" />
         <meta property="og:url" content="https://dhruvsonagra.me/" />
         <meta property="og:type" content="website" />
