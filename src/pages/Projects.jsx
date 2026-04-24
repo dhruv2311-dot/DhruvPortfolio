@@ -20,6 +20,8 @@ import './Projects.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const isPostmanDocUrl = (url) => typeof url === 'string' && /(^https?:\/\/)?(www\.)?documenter\.getpostman\.com\//i.test(url);
+
 // ── Helper: build iframe src with correct mute param ──────────
 const buildVideoSrc = (url, muted) => {
   if (!url) return null;
@@ -275,7 +277,7 @@ const VideoProjectCard = ({ project, onSelect }) => {
               GitHub
             </a>
           )}
-          {project.links.api && (
+          {isPostmanDocUrl(project.links.api) && (
             <a href={project.links.api} target="_blank" rel="noopener noreferrer"
               onClick={e => e.stopPropagation()}
               style={{
@@ -557,7 +559,7 @@ const Projects = () => {
         demo: null,
         github: 'https://github.com/dhruv2311-dot/EcoFinds',
         figma: null,
-        api: 'https://ecofinds-api.render.com'
+        api: null
       },
       featured: true
     },
@@ -591,7 +593,7 @@ const Projects = () => {
         demo: 'https://coreinventory.vercel.app',
         github: 'https://github.com/dhruv2311-dot/CoreInventory',
         figma: null,
-        api: 'https://coreinventory-api.onrender.com'
+        api: null
       },
       featured: true
     },
@@ -608,7 +610,7 @@ const Projects = () => {
         demo: 'https://rewear.vercel.app',
         github: 'https://github.com/dhruv2311-dot/ReWear',
         figma: null,
-        api: 'https://rewear-api.onrender.com/api/health'
+        api: null
       },
       featured: true
     },
@@ -1101,7 +1103,7 @@ const ProjectModal = ({ project, onClose }) => {
                 View Code
               </a>
             )}
-            {project.links.api && (
+            {isPostmanDocUrl(project.links.api) && (
               <a
                 href={project.links.api}
                 target="_blank"

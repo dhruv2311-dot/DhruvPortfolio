@@ -2,6 +2,8 @@ import { useState, useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { FaGithub, FaExternalLinkAlt, FaPlay } from 'react-icons/fa';
 
+const isPostmanDocUrl = (url) => typeof url === 'string' && /(^https?:\/\/)?(www\.)?documenter\.getpostman\.com\//i.test(url);
+
 const ProjectCard = ({ project, onSelect, isFocused }) => {
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef(null);
@@ -333,7 +335,7 @@ const ProjectCard = ({ project, onSelect, isFocused }) => {
             </motion.a>
           )}
 
-          {project.links.api && (
+          {isPostmanDocUrl(project.links.api) && (
             <motion.a 
               href={project.links.api} 
               target="_blank" 
