@@ -617,7 +617,7 @@ const Projects = () => {
       title: 'StockMaster - Modular Inventory Control',
       category: 'Hackathons',
       description: 'Built during Odoo x SPIT Hackathon, StockMaster is a role-aware inventory workspace with realtime stock updates, receipts, deliveries, transfers, adjustments, and audit-ready ledger workflows.',
-      image: 'https://images.unsplash.com/photo-1586528116493-6d31f57f2f84?w=1200&h=800&fit=crop',
+      image: 'https://images.unsplash.com/photo-1553413077-190dd305871c?w=1200&h=800&fit=crop',
       videoUrl: null,
       tech: ['Next.js 14', 'React 18', 'Supabase', 'PostgreSQL', 'Tailwind CSS', 'Vitest'],
       links: {
