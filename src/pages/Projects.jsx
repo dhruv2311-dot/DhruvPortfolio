@@ -555,28 +555,11 @@ const Projects = () => {
       videoUrl: null,
       tech: ['React.js', 'Node.js', 'Express.js', 'MongoDB', 'Tailwind CSS', 'JWT'],
       links: {
-        live: 'https://ecofinds.vercel.app',
+        live: 'https://eco-finds-pink.vercel.app/',
         demo: null,
         github: 'https://github.com/dhruv2311-dot/EcoFinds',
         figma: null,
-        api: null
-      },
-      featured: true
-    },
-    {
-      id: 20,
-      title: 'Expenseura - Smart Expense Management System',
-      category: 'Hackathons',
-      description: 'Built during Odoo x Amalthea Hackathon, Expenseura streamlines company expense tracking with OCR receipt extraction, multi-level approvals, and multi-currency support.',
-      image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&h=800&fit=crop',
-      videoUrl: null,
-      tech: ['React 18', 'Vite', 'TailwindCSS', 'Supabase', 'PostgreSQL', 'Tesseract.js'],
-      links: {
-        live: null,
-        demo: null,
-        github: 'https://github.com/dhruv2311-dot/Expenseura',
-        figma: null,
-        api: 'https://github.com/dhruv2311-dot/Expenseura/blob/main/Docs/API_DOCUMENTATION.md'
+        api: 'https://documenter.getpostman.com/view/39189509/2sBXwjwtjr'
       },
       featured: true
     },
@@ -589,11 +572,11 @@ const Projects = () => {
       videoUrl: null,
       tech: ['React', 'Vite', 'Node.js', 'Express', 'Supabase', 'Tailwind CSS', 'React Query', 'Zustand'],
       links: {
-        live: 'https://coreinventory.vercel.app',
-        demo: 'https://coreinventory.vercel.app',
+        live: 'https://core-inventory-23.vercel.app/',
+        demo: null,
         github: 'https://github.com/dhruv2311-dot/CoreInventory',
         figma: null,
-        api: null
+        api: 'https://documenter.getpostman.com/view/39189509/2sBXwjwtjw'
       },
       featured: true
     },
@@ -606,11 +589,11 @@ const Projects = () => {
       videoUrl: null,
       tech: ['React 19', 'Node.js', 'Express.js', 'MongoDB', 'Socket.io', 'JWT', 'Cloudinary'],
       links: {
-        live: 'https://rewear.vercel.app',
-        demo: 'https://rewear.vercel.app',
+        live: 'https://re-wear-delta.vercel.app/',
+        demo: null,
         github: 'https://github.com/dhruv2311-dot/ReWear',
         figma: null,
-        api: null
+        api: 'https://documenter.getpostman.com/view/39189509/2sBXwjwtjt'
       },
       featured: true
     },
@@ -640,7 +623,7 @@ const Projects = () => {
       videoUrl: null,
       tech: ['React 18', 'Node.js', 'Express 4', 'MongoDB', 'Mongoose', 'Zustand', 'Framer Motion'],
       links: {
-        live: null,
+        live: 'https://globe-trotter-beryl.vercel.app/',
         demo: null,
         github: 'https://github.com/dhruv2311-dot/GlobeTrotter',
         figma: null,
