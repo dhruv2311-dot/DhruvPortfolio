@@ -116,7 +116,7 @@ const buildVideoSrc = (url, muted) => {
 };
 
 // ── VideoProjectCard ──────────────────────────────────────────
-const VideoProjectCard = ({ project, onSelect }) => {
+const VideoProjectCard = ({ project, onSelect, onDemoPreview }) => {
   const [hovered, setHovered]   = useState(false);
   const [muted, setMuted]       = useState(true);
   const [showVideo, setShowVideo] = useState(false);
@@ -327,17 +327,22 @@ const VideoProjectCard = ({ project, onSelect }) => {
             </a>
           )}
           {project.links.demo && (
-            <a href={project.links.demo} target="_blank" rel="noopener noreferrer"
-              onClick={e => e.stopPropagation()}
+            <button
+              type="button"
+              onClick={e => {
+                e.stopPropagation();
+                onDemoPreview(project);
+              }}
               style={{
                 flex: 1, textAlign: 'center', padding: '0.5rem',
                 background: 'rgba(0,212,255,0.12)',
                 border: '1px solid rgba(0,212,255,0.3)',
                 color: '#00d4ff', borderRadius: '8px',
                 fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none'
+                , cursor: 'pointer'
               }}>
               Demo
-            </a>
+            </button>
           )}
           {project.links.github && (
             <a href={project.links.github} target="_blank" rel="noopener noreferrer"
