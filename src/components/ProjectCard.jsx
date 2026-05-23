@@ -4,7 +4,7 @@ import { FaGithub, FaExternalLinkAlt, FaPlay } from 'react-icons/fa';
 
 const isPostmanDocUrl = (url) => typeof url === 'string' && /(^https?:\/\/)?(www\.)?documenter\.getpostman\.com\//i.test(url);
 
-const ProjectCard = ({ project, onSelect, isFocused }) => {
+const ProjectCard = ({ project, onSelect, onDemoPreview, isFocused }) => {
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef(null);
 
@@ -276,11 +276,12 @@ const ProjectCard = ({ project, onSelect, isFocused }) => {
           )}
           
           {project.links.demo && (
-            <motion.a 
-              href={project.links.demo} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              onClick={e => e.stopPropagation()}
+            <motion.button 
+              type="button"
+              onClick={e => {
+                e.stopPropagation();
+                onDemoPreview(project);
+              }}
               whileHover={{ y: -4, scale: 1.02, backgroundColor: 'rgba(59,130,246,0.2)', boxShadow: '0 0 20px rgba(59,130,246,0.3)' }}
               style={{
                 display: 'flex',
@@ -298,11 +299,12 @@ const ProjectCard = ({ project, onSelect, isFocused }) => {
                 color: '#93c5fd',
                 backdropFilter: 'blur(12px)',
                 transition: 'all 0.3s ease',
-                textDecoration: 'none'
+                textDecoration: 'none',
+                cursor: 'pointer'
               }}
             >
               <FaPlay size={12} /> Demo
-            </motion.a>
+            </motion.button>
           )}
 
           {project.links.github && (

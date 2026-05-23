@@ -22,6 +22,81 @@ gsap.registerPlugin(ScrollTrigger);
 
 const isPostmanDocUrl = (url) => typeof url === 'string' && /(^https?:\/\/)?(www\.)?documenter\.getpostman\.com\//i.test(url);
 
+const isYouTubeUrl = (url) => typeof url === 'string' && /(youtube\.com|youtu\.be)/i.test(url);
+
+const isGoogleDriveUrl = (url) => typeof url === 'string' && /drive\.google\.com/i.test(url);
+
+const extractYouTubeVideoId = (url) => {
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.hostname.includes('youtu.be')) {
+      return parsedUrl.pathname.split('/').filter(Boolean)[0] || null;
+    }
+
+    if (parsedUrl.pathname.includes('/shorts/')) {
+      const parts = parsedUrl.pathname.split('/').filter(Boolean);
+      const shortsIndex = parts.indexOf('shorts');
+      return shortsIndex >= 0 ? parts[shortsIndex + 1] || null : null;
+    }
+
+    return parsedUrl.searchParams.get('v');
+  } catch {
+    return null;
+  }
+};
+
+const extractGoogleDriveFileId = (url) => {
+  const fileMatch = url.match(/\/file\/d\/([^/]+)/i);
+  if (fileMatch) return fileMatch[1];
+
+  const idMatch = url.match(/[?&]id=([^&]+)/i);
+  if (idMatch) return idMatch[1];
+
+  return null;
+};
+
+const buildDemoEmbedUrl = (url, muted) => {
+  if (!url) return null;
+
+  if (isYouTubeUrl(url)) {
+    const videoId = extractYouTubeVideoId(url);
+    if (!videoId) return url;
+
+    const params = new URLSearchParams({
+      autoplay: '1',
+      mute: muted ? '1' : '0',
+      controls: '1',
+      rel: '0',
+      playsinline: '1'
+    });
+
+    return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+  }
+
+  if (isGoogleDriveUrl(url)) {
+    const fileId = extractGoogleDriveFileId(url);
+    if (!fileId) return url;
+
+    const params = new URLSearchParams({
+      autoplay: '1',
+      mute: muted ? '1' : '0'
+    });
+
+    return `https://drive.google.com/file/d/${fileId}/preview?${params.toString()}`;
+  }
+
+  try {
+    const parsedUrl = new URL(url);
+    parsedUrl.searchParams.set('autoplay', '1');
+    parsedUrl.searchParams.set('mute', muted ? '1' : '0');
+    parsedUrl.searchParams.set('controls', '1');
+    return parsedUrl.toString();
+  } catch {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}autoplay=1&mute=${muted ? 1 : 0}&controls=1`;
+  }
+};
+
 // ── Helper: build iframe src with correct mute param ──────────
 const buildVideoSrc = (url, muted) => {
   if (!url) return null;
@@ -317,6 +392,7 @@ const Projects = () => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedProject, setSelectedProject] = useState(null);
   const [focusedProjectId, setFocusedProjectId] = useState(null);
+  const [videoPreviewProject, setVideoPreviewProject] = useState(null);
 
   const categories = ['All', 'HTML/CSS', 'MERN', 'Figma', 'Hackathons'];
 
@@ -863,6 +939,7 @@ const Projects = () => {
                   key={project.id}
                   project={project}
                   onSelect={setSelectedProject}
+                  onDemoPreview={setVideoPreviewProject}
                   isFocused={focusedProjectId !== null && focusedProjectId !== project.id}
                 />
               ))}
@@ -876,6 +953,17 @@ const Projects = () => {
             <ProjectModal
               project={selectedProject}
               onClose={() => setSelectedProject(null)}
+              onDemoPreview={setVideoPreviewProject}
+            />
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {videoPreviewProject && (
+            <VideoPreviewModal
+              key={videoPreviewProject.id}
+              project={videoPreviewProject}
+              onClose={() => setVideoPreviewProject(null)}
             />
           )}
         </AnimatePresence>
@@ -887,7 +975,7 @@ const Projects = () => {
 /**
  * Project Modal Component
  */
-const ProjectModal = ({ project, onClose }) => {
+const ProjectModal = ({ project, onClose, onDemoPreview }) => {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -1063,16 +1151,15 @@ const ProjectModal = ({ project, onClose }) => {
               </a>
             )}
             {project.links.demo && (
-              <a
-                href={project.links.demo}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => onDemoPreview(project)}
                 className="btn btn-secondary"
                 style={{ flex: 1, justifyContent: 'center' }}
               >
                 <FaPlay style={{ marginRight: '0.5rem' }} />
                 Demo Video
-              </a>
+              </button>
             )}
             {project.links.github && (
               <a
@@ -1098,6 +1185,114 @@ const ProjectModal = ({ project, onClose }) => {
                 API Docs
               </a>
             )}
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+const VideoPreviewModal = ({ project, onClose }) => {
+  const [muted, setMuted] = useState(true);
+
+  const embedUrl = buildDemoEmbedUrl(project.links.demo, muted);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 1100,
+        background: 'rgba(2, 6, 23, 0.9)',
+        backdropFilter: 'blur(12px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '1.5rem'
+      }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.94, y: 20 }}
+        transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+        style={{
+          width: 'min(1100px, 100%)',
+          background: 'linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98))',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '1.5rem',
+          overflow: 'hidden',
+          boxShadow: '0 30px 80px rgba(0, 0, 0, 0.45)'
+        }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          padding: '1rem 1.25rem',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+        }}>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.14em' }}>
+              Demo Video
+            </div>
+            <h3 style={{ marginTop: '0.25rem', fontSize: '1rem', color: '#fff' }}>
+              {project.title}
+            </h3>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <button
+              type="button"
+              onClick={() => setMuted(prev => !prev)}
+              className="btn btn-secondary"
+              style={{ padding: '0.55rem 0.9rem' }}
+            >
+              {muted ? <FaVolumeMute style={{ marginRight: '0.5rem' }} /> : <FaVolumeUp style={{ marginRight: '0.5rem' }} />}
+              {muted ? 'Unmute' : 'Mute'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-secondary"
+              style={{ padding: '0.55rem 0.8rem' }}
+            >
+              <FaTimes />
+            </button>
+          </div>
+        </div>
+
+        <div style={{ position: 'relative', background: '#000' }}>
+          <div style={{ aspectRatio: '16 / 9' }}>
+            {embedUrl && (
+              <iframe
+                key={`${project.id}-${muted}`}
+                src={embedUrl}
+                title={`${project.title} demo video`}
+                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                allowFullScreen
+                style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+              />
+            )}
+          </div>
+          <div style={{
+            position: 'absolute',
+            left: '1rem',
+            bottom: '1rem',
+            padding: '0.5rem 0.75rem',
+            borderRadius: '999px',
+            background: 'rgba(2, 6, 23, 0.7)',
+            color: '#cbd5e1',
+            fontSize: '0.8rem',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+            Starts muted for browser autoplay. Unmute if you want audio.
           </div>
         </div>
       </motion.div>
