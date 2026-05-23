@@ -1216,7 +1216,8 @@ const VideoPreviewModal = ({ project, onClose }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '1.5rem'
+        padding: '1.5rem',
+        overflow: 'auto'
       }}
       onClick={onClose}
     >
@@ -1227,11 +1228,14 @@ const VideoPreviewModal = ({ project, onClose }) => {
         transition={{ type: 'spring', damping: 24, stiffness: 220 }}
         style={{
           width: 'min(1100px, 100%)',
+          maxHeight: 'calc(100vh - 3rem)',
           background: 'linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98))',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           borderRadius: '1.5rem',
           overflow: 'hidden',
-          boxShadow: '0 30px 80px rgba(0, 0, 0, 0.45)'
+          boxShadow: '0 30px 80px rgba(0, 0, 0, 0.45)',
+          display: 'flex',
+          flexDirection: 'column'
         }}
         onClick={e => e.stopPropagation()}
       >
@@ -1273,8 +1277,8 @@ const VideoPreviewModal = ({ project, onClose }) => {
           </div>
         </div>
 
-        <div style={{ position: 'relative', background: '#000' }}>
-          <div style={{ aspectRatio: '16 / 9' }}>
+        <div style={{ position: 'relative', background: '#000', flex: 1, minHeight: 0 }}>
+          <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', maxHeight: 'calc(100vh - 10rem)' }}>
             {embedUrl && (
               <iframe
                 key={`${project.id}-${muted}`}
@@ -1282,7 +1286,7 @@ const VideoPreviewModal = ({ project, onClose }) => {
                 title={`${project.title} demo video`}
                 allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
                 allowFullScreen
-                style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none', display: 'block' }}
               />
             )}
           </div>
@@ -1295,7 +1299,8 @@ const VideoPreviewModal = ({ project, onClose }) => {
             background: 'rgba(2, 6, 23, 0.7)',
             color: '#cbd5e1',
             fontSize: '0.8rem',
-            border: '1px solid rgba(255, 255, 255, 0.1)'
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            pointerEvents: 'none'
           }}>
             Starts muted for browser autoplay. Unmute if you want audio.
           </div>
