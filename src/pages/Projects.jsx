@@ -472,13 +472,14 @@ const Projects = () => {
       category: 'HTML/CSS',
       description: 'E-commerce platform with modern UI and seamless shopping experience.',
       image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1739943602/bgrat7sxisqwumu4x1vn.png',
-      videoUrl: null,
+      videoUrl: 'https://youtu.be/M1EU0QD8_7k?si=7NDqtdwANqqN1KzY',
       tech: ['React', 'Tailwind CSS'],
       links: {
         live: 'https://purple21.netlify.app/',
         github: 'https://github.com/dhruv2311-dot/PURPLE',
         figma: null,
-        api: null
+        api: null,
+        demo: 'https://youtu.be/M1EU0QD8_7k?si=7NDqtdwANqqN1KzY'
       },
       featured: true
     },
@@ -488,13 +489,14 @@ const Projects = () => {
       category: 'HTML/CSS',
       description: 'Online pharmacy platform with medicine delivery system.',
       image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1739943561/y4vnpuulvuibf86l0dj9.png',
-      videoUrl: null,
+      videoUrl: 'https://youtu.be/u5BsBs6owtY?si=78i4I3rsNFnPTpz2',
       tech: ['HTML', 'CSS', 'JavaScript'],
       links: {
         live: 'https://bespoke-blini-7c10e3.netlify.app/',
         github: 'https://github.com/dhruv2311-dot/pharmeasy',
         figma: null,
-        api: null
+        api: null,
+        demo: 'https://youtu.be/u5BsBs6owtY?si=78i4I3rsNFnPTpz2'
       },
       featured: false
     },
@@ -504,13 +506,14 @@ const Projects = () => {
       category: 'HTML/CSS',
       description: 'Property booking platform with advanced filtering and booking system.',
       image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1739943420/hireavilla_ag5gso.png',
-      videoUrl: null,
+      videoUrl: 'https://youtu.be/eug4R9YA1Ms?si=0lc9DC_Fnx-5y9EC',
       tech: ['HTML', 'CSS', 'JavaScript'],
       links: {
         live: 'https://hireavilla12.netlify.app/',
         github: 'https://github.com/dhruv2311-dot/HIREAVILLA',
         figma: null,
-        api: null
+        api: null,
+        demo: 'https://youtu.be/eug4R9YA1Ms?si=0lc9DC_Fnx-5y9EC'
       },
       featured: false
     },
@@ -520,13 +523,14 @@ const Projects = () => {
       category: 'MERN',
       description: 'A Netflix clone built with React, featuring a responsive design, smooth navigation, and dynamic content loading. It offers a seamless streaming experience with an intuitive user interface.',
       image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1747942711/Screenshot_2025-05-23_010754_duojcu.png',
-      videoUrl: null,
+      videoUrl: 'https://youtu.be/7WNsCO0fqig?si=rxZQxjrT8IfZgJMD',
       tech: ['React', 'Tailwind CSS'],
       links: {
         live: 'https://netflix-u9ng.onrender.com/',
         github: 'https://github.com/dhruv2311-dot/netflix',
         figma: null,
-        api: null
+        api: null,
+        demo: 'https://youtu.be/7WNsCO0fqig?si=rxZQxjrT8IfZgJMD'
       },
       featured: true
     },
@@ -536,13 +540,14 @@ const Projects = () => {
       category: 'MERN',
       description: 'A classic Tic Tac Toe game developed using React, featuring a responsive UI, smooth gameplay, and dynamic state management for an engaging experience.',
       image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1740157368/gtsplesiovqz4emqthn2.png',
-      videoUrl: null,
+      videoUrl: 'https://youtu.be/uuahuyxG0zM?si=Apep4-kjIsdgnAsN',
       tech: ['React', 'Tailwind CSS'],
       links: {
         live: 'https://tic-tac-toe-sandy-two.vercel.app/',
         github: 'https://github.com/dhruv2311-dot/Tic-Tac-Toe',
         figma: null,
-        api: null
+        api: null,
+        demo: 'https://youtu.be/uuahuyxG0zM?si=Apep4-kjIsdgnAsN'
       },
       featured: false
     },
@@ -584,13 +589,14 @@ const Projects = () => {
       category: 'MERN',
       description: 'A dynamic YouTube clone featuring real-time video updates, interactive UI, and seamless streaming. Built with React and Node.js, it integrates a custom YouTube API for personalized content delivery.',
       image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1740156747/Screenshot_2025-02-21_221308_uqsfq2.png',
-      videoUrl: null,
+      videoUrl: 'https://youtu.be/FYefRynNFCQ?si=fOQ5AyR2w0qtx6Et',
       tech: ['React', 'Node.js', 'Express', 'MongoDB'],
       links: {
         live: 'https://youtube-api-lomc.vercel.app/',
         github: 'https://github.com/dhruv2311-dot/Youtube-API',
         figma: null,
-        api: null
+        api: null,
+        demo: 'https://youtu.be/FYefRynNFCQ?si=fOQ5AyR2w0qtx6Et'
       },
       featured: false
     },
