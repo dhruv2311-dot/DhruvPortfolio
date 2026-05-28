@@ -557,13 +557,14 @@ const Projects = () => {
       category: 'MERN',
       description: 'Event management platform with real-time updates and interactive features.',
       image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1739943406/eventura_tuntzx.png',
-      videoUrl: null,
+      videoUrl: 'https://youtu.be/3drgquKM4o8?si=K1ol6J4BGV7bwOZH',
       tech: ['React', 'Node.js', 'Express', 'MongoDB'],
       links: {
         live: 'https://eventura-23.netlify.app/',
         github: 'https://github.com/dhruv2311-dot/eventura-',
         figma: null,
-        api: 'https://documenter.getpostman.com/view/39189509/2sAYX3s4Dc'
+        api: 'https://documenter.getpostman.com/view/39189509/2sAYX3s4Dc',
+        demo: 'https://youtu.be/3drgquKM4o8?si=K1ol6J4BGV7bwOZH'
       },
       featured: true
     },
@@ -573,13 +574,14 @@ const Projects = () => {
       category: 'MERN',
       description: 'FarmTrust is a comprehensive platform for farmers, offering real-time updates, an AI chatbot for assistance, and a user-friendly interface. It connects farmers with buyers, ensuring efficient transactions and support.',
       image: 'https://res.cloudinary.com/dtkzxbcjx/image/upload/v1747942311/Screenshot_2025-05-23_005646_qd6hzt.png',
-      videoUrl: null,
+      videoUrl: 'https://youtu.be/djjPbC6RjfM?si=DIfwCttOwdgoHNzW',
       tech: ['React', 'Node.js', 'MongoDB', 'Express', 'Socket.io', 'AI Chatbot', 'i18n', 'Authentication'],
       links: {
         live: 'https://farmtrust.netlify.app/',
         github: 'https://github.com/dhruv2311-dot/FarmTrust',
         figma: null,
-        api: 'https://documenter.getpostman.com/view/39189509/2sAYX3s4Dc'
+        api: 'https://documenter.getpostman.com/view/39189509/2sAYX3s4Dc',
+        demo: 'https://youtu.be/djjPbC6RjfM?si=DIfwCttOwdgoHNzW'
       },
       featured: true
     },
