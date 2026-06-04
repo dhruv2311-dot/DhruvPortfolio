@@ -641,11 +641,11 @@ const Projects = () => {
       category: 'Hackathons',
       description: 'Built for Odoo x NMIT Hackathon 2025, EcoFinds is a full-stack marketplace focused on circular economy by helping users buy and sell pre-owned products securely.',
       image: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=1200&h=800&fit=crop',
-      videoUrl: null,
+      videoUrl: 'https://youtu.be/ZGDns89RMPE?si=bMdbLDyrEYiRiesX',
       tech: ['React.js', 'Node.js', 'Express.js', 'MongoDB', 'Tailwind CSS', 'JWT'],
       links: {
         live: 'https://eco-finds-pink.vercel.app/',
-        demo: null,
+        demo: 'https://youtu.be/ZGDns89RMPE?si=bMdbLDyrEYiRiesX',
         github: 'https://github.com/dhruv2311-dot/EcoFinds',
         figma: null,
         api: 'https://documenter.getpostman.com/view/39189509/2sBXwjwtjr'
@@ -675,11 +675,11 @@ const Projects = () => {
       category: 'MERN',
       description: 'A full-stack MERN clothing exchange marketplace with real-time chat, secure authentication, admin moderation tools, and sustainability-focused swapping workflows.',
       image: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=1200&h=800&fit=crop',
-      videoUrl: null,
+      videoUrl: 'https://youtu.be/i5C2zrW91nM?si=qNlvbTtsrkDcuDk-',
       tech: ['React 19', 'Node.js', 'Express.js', 'MongoDB', 'Socket.io', 'JWT', 'Cloudinary'],
       links: {
         live: 'https://re-wear-delta.vercel.app/',
-        demo: null,
+        demo: 'https://youtu.be/i5C2zrW91nM?si=qNlvbTtsrkDcuDk-',
         github: 'https://github.com/dhruv2311-dot/ReWear',
         figma: null,
         api: 'https://documenter.getpostman.com/view/39189509/2sBXwjwtjt'
@@ -709,11 +709,11 @@ const Projects = () => {
       category: 'MERN',
       description: 'A premium MERN travel planning platform with trip creation, itinerary management, community sharing, admin analytics, and rich travel discovery workflows.',
       image: 'https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1200&h=800&fit=crop',
-      videoUrl: null,
+      videoUrl: 'https://youtu.be/6aurE6GCzkY?si=x8gApRQfUpf_I63r',
       tech: ['React 18', 'Node.js', 'Express 4', 'MongoDB', 'Mongoose', 'Zustand', 'Framer Motion'],
       links: {
         live: 'https://globe-trotter-beryl.vercel.app/',
-        demo: null,
+        demo: 'https://youtu.be/6aurE6GCzkY?si=x8gApRQfUpf_I63r',
         github: 'https://github.com/dhruv2311-dot/GlobeTrotter',
         figma: null,
         api: 'https://documenter.getpostman.com/view/39189509/2sBXinGAMV'
