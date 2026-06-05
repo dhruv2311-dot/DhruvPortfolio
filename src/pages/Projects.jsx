@@ -1000,10 +1000,11 @@ const ProjectModal = ({ project, onClose, onDemoPreview }) => {
         background: 'rgba(10, 14, 26, 0.95)',
         backdropFilter: 'blur(10px)',
         zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '2rem'
+        display: 'grid',
+        placeItems: 'center',
+        padding: '1rem',
+        boxSizing: 'border-box',
+        overflowY: 'auto'
       }}
       onClick={onClose}
     >
@@ -1018,8 +1019,10 @@ const ProjectModal = ({ project, onClose, onDemoPreview }) => {
           borderRadius: '1.5rem',
           maxWidth: '900px',
           width: '100%',
-          maxHeight: '90vh',
-          overflow: 'auto'
+          maxHeight: 'calc(100dvh - 2rem)',
+          overflow: 'auto',
+          margin: 'auto',
+          boxSizing: 'border-box'
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -1221,10 +1224,10 @@ const VideoPreviewModal = ({ project, onClose }) => {
         zIndex: 1100,
         background: 'rgba(2, 6, 23, 0.9)',
         backdropFilter: 'blur(12px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '1.5rem',
+        display: 'grid',
+        placeItems: 'center',
+        padding: '1rem',
+        boxSizing: 'border-box',
         overflow: 'auto'
       }}
       onClick={onClose}
@@ -1236,14 +1239,16 @@ const VideoPreviewModal = ({ project, onClose }) => {
         transition={{ type: 'spring', damping: 24, stiffness: 220 }}
         style={{
           width: 'min(1100px, 100%)',
-          maxHeight: 'calc(100vh - 3rem)',
+          maxHeight: 'calc(100dvh - 2rem)',
           background: 'linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98))',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           borderRadius: '1.5rem',
           overflow: 'hidden',
           boxShadow: '0 30px 80px rgba(0, 0, 0, 0.45)',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          margin: 'auto',
+          boxSizing: 'border-box'
         }}
         onClick={e => e.stopPropagation()}
       >
