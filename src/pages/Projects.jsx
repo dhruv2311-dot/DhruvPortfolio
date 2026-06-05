@@ -658,11 +658,11 @@ const Projects = () => {
       category: 'Hackathons',
       description: 'Built during Odoo x Indus Virtual Hackathon, CoreInventory is an inventory operations platform for products, receipts, deliveries, stock movement, and warehouse/location controls.',
       image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200&h=800&fit=crop',
-      videoUrl: null,
+      videoUrl: 'https://youtu.be/noDE-GWAO4E?si=3BD1T_P1DaQ7fDR8',
       tech: ['React', 'Vite', 'Node.js', 'Express', 'Supabase', 'Tailwind CSS', 'React Query', 'Zustand'],
       links: {
         live: 'https://core-inventory-23.vercel.app/',
-        demo: null,
+        demo: 'https://youtu.be/noDE-GWAO4E?si=3BD1T_P1DaQ7fDR8',
         github: 'https://github.com/dhruv2311-dot/CoreInventory',
         figma: null,
         api: 'https://documenter.getpostman.com/view/39189509/2sBXwjwtjw'
